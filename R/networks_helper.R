@@ -28,3 +28,17 @@ residualise <- function(row, conds, scale=T){
 	    return(residuals)
 	    }
 
+	 
+sampleMatrix <- function(cor.matrix, n, nsamples=1000){
+
+	     mean.cors = c()
+	     # sample a correlation matrix
+	     for (i in 1:nsamples){
+	     	 ids <- sample(rownames(cor.matrix), n, replace=FALSE)
+		 cor.sub <- cor.matrix[ids, ids]
+		 diag(cor.sub) <- NA
+		 mean.cor <- mean(cor.sub, na.rm=T)
+		 mean.cors <- append(mean.cors, mean.cor)
+	     }
+	     return(mean.cors)
+	     }
