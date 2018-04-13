@@ -5,6 +5,7 @@
 library(ggplot2)
 library(gplots)
 library(gtools)
+library(DESeq2)
 library(RSQLite)
 
 #################################
@@ -43,6 +44,7 @@ getResultsTable <- function(res, featureData){
 
 	rownames(featureData) <- featureData$gene_id
 	results <- data.frame(res@listData)
+	rownames(results) <- res@rownames
 	results$gene_id <- rownames(results)
 	results$gene_name <- featureData[results$gene_id,]$gene_name
 	return(results)
@@ -163,4 +165,46 @@ heatmapMatrix <- function(mat){
 	      mat.s <- mat.s[,mixedsort(colnames(mat.s))]
 	      heatmap.2(as.matrix(mat.s), col=colours, Rowv=T, Colv=T, trace="none", margins=c(15,15))
 	      }
+
+################################
+# MAplot
+################################
+
+getContrast <- function(dds, factor=c("condition"), contrast=c("PSC", "UC")){
+
+	    contrast <- append(factor, contrast)
+	    res <- results(dds, contrast=contrast)
+	    return(res)
+	    }
+	    
+
+MAPlot <- function(res, lfc=1, test.in=F, test.set, title="default title"){
+
+         dat <- data.frame(res@listData)	    
+	 rownames(dat) <- res@rownames
+	 dat$gene_id <- rownames(dat)
+
+	 if (test.in == TRUE){
+	         dat$significant <- ifelse(dat$padj < 0.05 & abs(dat$log2FoldChange) > lfc & dat$gene_id %in% test.set, "Yes", "No")}
+	 else{
+	         dat$significant <- ifelse(dat$padj < 0.05 & abs(dat$log2FoldChange) > lfc, "Yes", "No")}
+
+       nup <- nrow(dat[dat$significant=="Yes" & dat$log2FoldChange > lfc & !(is.na(dat$padj)) & !(is.na(dat$log2FoldChange)),])
+       ndown <- nrow(dat[dat$significant=="Yes" & dat$log2FoldChange < (-lfc) & !(is.na(dat$padj)) & !(is.na(dat$log2FoldChange)),])
+
+       nup <- paste("Upregulated = ", nup, sep="")
+       ndown <- paste("Downregulated = ", ndown, sep="")
+
+       plot1 <- ggplot(na.omit(dat), aes(x=log2(baseMean + 1), y=log2FoldChange, colour=significant))
+       plot2 <- plot1 + geom_point(pch=18, size=1)
+       plot3 <- plot2 + scale_colour_manual(values=c("grey", "darkRed"))
+       plot4 <- plot3 + theme_bw()
+       plot5 <- plot4 + theme(text=element_text(size=10))
+       plot6 <- plot5 + geom_hline(yintercept=c(-1,1,0), linetype="dashed")
+       plot7 <- plot6 + xlab("Mean expression") + ylab("Log2 fold change")
+       plot8 <- plot7 + annotate("text", x=9, y=6, label=nup, size=3)
+       plot9 <- plot8 + annotate("text", x=9, y=-6, label=ndown, size=3)
+       plot10 <- plot9 + ggtitle(title)
+       return (plot10)
+       }
 
