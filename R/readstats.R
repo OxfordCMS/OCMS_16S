@@ -144,6 +144,27 @@ plotProportionReadsMapped <- function(df){
 			  return(plot5)
 			  }
 
+getNumberSecondaryAlignments <- function(db){
+
+	      sqlite <- dbDriver("SQLite")
+	      db <- dbConnect(sqlite, db)
+	      df <- dbGetQuery(db, 'SELECT track, alignments_mapped, alignments_secondary FROM bam_stats;')
+	      df <- melt(df)
+	      dbDisconnect(db)
+	      return(df)
+	      }
+
+plotNumberSecondaryAlignments <- function(df){
+
+			      plot1 <- ggplot(df, aes(x=track, y=value, fill=variable))
+			      plot2 <- plot1 + geom_bar(stat="identity")
+			      plot3 <- plot2 + theme(axis.text.x=element_text(angle=90))
+			      plot4 <- plot3 + scale_fill_manual(values=c("grey", "red3"))
+			      plot5 <- plot4 + ggtitle("Number of alignments/secondary alignments")
+			      plot6 <- plot5 + theme_bw()
+			      return(plot4)
+			      }
+			      
 getContextStats <- function(db){
 
 	      sqlite <- dbDriver("SQLite")
