@@ -151,6 +151,47 @@ plotPCA <- function(pc, pcs=c("PC1", "PC2")){
 	return(plot4) 
 	}
 
+plotPCAWithCovariate <- function(pc, covariate, pcs=c("PC1", "PC2")){
+
+        # covariate must be in same order as pc rownames
+
+	# get variance explained for each component
+	ve1 <- getVE(pc, component=pcs[1])
+	ve2 <- getVE(pc, component=pcs[2])
+
+	ve1 <- round(ve1, 2)*100
+	ve2 <- round(ve2, 2)*100
+
+	# get data frame of components
+	pca <- data.frame(pc$x)
+
+	# add conditions
+	pca$condition <- makeConds(rownames(pca))
+	pca$condition <- factor(pca$condition, levels=unique(pca$condition))
+
+	# add covariate
+	pca$covariate <- covariate
+
+	# plot
+	pc1 <- pcs[1]
+	pc2 <- pcs[2]
+
+	# labels
+	xlabel <- paste(pc1, ve1, sep=" (")
+	xlabel <- paste(xlabel, "%", sep="")
+	xlabel <- paste(xlabel, ")", sep="")
+	ylabel <- paste(pc2, ve2, sep=" (")
+	ylabel <- paste(ylabel, "%", sep="")	
+	ylabel <- paste(ylabel, ")", sep="")
+
+	plot1 <- ggplot(pca, aes_string(x=pc1, y=pc2, group="condition", colour="condition", shape="covariate"))
+	plot2 <- plot1 + geom_point(size=3)
+	plot3 <- plot2 + theme_bw() + stat_ellipse(geom="polygon", alpha=0.1, level=0.8, aes(fill=condition))
+	plot4 <- plot3 + xlab(xlabel) + ylab(ylabel)
+	return(plot4) 
+	}
+
+
 ########################################
 # heatmap
 ########################################

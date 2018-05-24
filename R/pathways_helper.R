@@ -23,12 +23,11 @@ plotPathways <- function(pathway.results){
 
 	     p.dat$goid <- factor(p.dat$goid, levels=p.dat$goid)
 
-	     plot10 <- ggplot(p.dat, aes(x=goid, y=ratio, label=scount))
-	     plot11 <- plot10 + geom_bar(stat="identity") + geom_text(vjust=-1)
-	     plot12 <- plot11 + theme_bw() + theme(text=element_text(angle=90))
-	     plot13 <- plot12 + ylim(c(0,5))
-	     plot14 <- plot13 + xlab("") + ylab("Fold enrichment")
-	     return(plot14)
+	     plot1 <- ggplot(p.dat, aes(x=goid, y=ratio, label=scount))
+	     plot2 <- plot1 + geom_bar(stat="identity") + geom_text(vjust=-1)
+	     plot3 <- plot2 + theme_bw() + theme(text=element_text(angle=90))
+	     plot4 <- plot3 + xlab("") + ylab("Fold enrichment")
+	     return(plot4)
 	     }
 
 buildGenesetGenelist <- function(pathway.table, genesets){
