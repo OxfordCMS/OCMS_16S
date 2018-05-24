@@ -162,7 +162,7 @@ plotNumberSecondaryAlignments <- function(df){
 			      plot4 <- plot3 + scale_fill_manual(values=c("grey", "red3"))
 			      plot5 <- plot4 + ggtitle("Number of alignments/secondary alignments")
 			      plot6 <- plot5 + theme_bw()
-			      return(plot4)
+			      return(plot6)
 			      }
 			      
 getContextStats <- function(db){
