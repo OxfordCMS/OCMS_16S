@@ -129,8 +129,8 @@ getProportionReadsMapped <- function(db){
 
 	      sqlite <- dbDriver("SQLite")
 	      db <- dbConnect(sqlite, db)
-	      df <- dbGetQuery(db, 'SELECT track, reads_mapped, reads_total FROM bam_stats;')
-	      df$p <- (df$reads_mapped/df$reads_total)*100
+	      df <- dbGetQuery(db, 'SELECT track, reads_total, reads_unmapped FROM bam_stats;')
+	      df$p <- ((df$reads_total - df$reads_unmapped)/df$reads_total)*100
 	      return(df)
 	      }
 
