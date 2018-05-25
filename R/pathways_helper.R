@@ -25,7 +25,7 @@ plotPathways <- function(pathway.results){
 
 	     plot1 <- ggplot(p.dat, aes(x=goid, y=ratio, label=scount))
 	     plot2 <- plot1 + geom_bar(stat="identity") + geom_text(vjust=-1)
-	     plot3 <- plot2 + theme_bw() + theme(text=element_text(angle=90))
+	     plot3 <- plot2 + theme_bw() + theme(axis.text.x=element_text(angle=90))
 	     plot4 <- plot3 + xlab("") + ylab("Fold enrichment")
 	     return(plot4)
 	     }
