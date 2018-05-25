@@ -158,10 +158,10 @@ plotNumberSecondaryAlignments <- function(df){
 
 			      plot1 <- ggplot(df, aes(x=track, y=value, fill=variable))
 			      plot2 <- plot1 + geom_bar(stat="identity")
-			      plot3 <- plot2 + theme(axis.text.x=element_text(angle=90))
+			      plot3 <- plot2 + theme_bw()
 			      plot4 <- plot3 + scale_fill_manual(values=c("grey", "red3"))
-			      plot5 <- plot4 + ggtitle("Number of alignments/secondary alignments")
-			      plot6 <- plot5 + theme_bw()
+			      plot5 <- plot4 + ggtitle("Secondary alignments")
+			      plot6 <- plot5 + theme(axis.text.x=element_text(angle=90))
 			      return(plot6)
 			      }
 			      
