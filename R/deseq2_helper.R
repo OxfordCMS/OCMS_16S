@@ -193,7 +193,7 @@ plotPCAWithCovariate <- function(pc, covariate, pcs=c("PC1", "PC2")){
 
 
 ########################################
-# heatmap
+# heatmaps
 ########################################
 
 heatmapMatrix <- function(mat){
@@ -205,6 +205,23 @@ heatmapMatrix <- function(mat){
 	      mat.s <- na.omit(mat.s)
 	      mat.s <- mat.s[,mixedsort(colnames(mat.s))]
 	      heatmap.2(as.matrix(mat.s), col=colours, Rowv=T, Colv=T, trace="none", margins=c(15,15))
+	      }
+
+heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation){
+
+	      colours <- colorRampPalette(c("blue", "white", "red"))(75)
+	      mat.s <- data.frame(t(apply(mat, 1, scale)))
+	      rownames(mat.s) <- rownames(mat)
+	      colnames(mat.s) <- colnames(mat)
+	      mat.s <- na.omit(mat.s)
+	      mat.s <- mat.s[,mixedsort(colnames(mat.s))]
+	      pheatmap(as.matrix(mat.s),
+	      color=colours,
+	      show_rownames=F,
+	      clustering_distance_cols="correlation",
+	      clustering_method="complete",
+	      scale="none",
+	      annotation_col=sample.annotation)
 	      }
 
 ################################
