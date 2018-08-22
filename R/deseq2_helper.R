@@ -243,9 +243,9 @@ MAPlot <- function(res, lfc=1, test.in=F, test.set, title="default title"){
 	 dat$gene_id <- rownames(dat)
 
 	 if (test.in == TRUE){
-	         dat$significant <- ifelse(dat$padj < 0.05 & abs(dat$log2FoldChange) > lfc & dat$gene_id %in% test.set, "Yes", "No")}
+	         dat$significant <- ifelse(dat$padj < 0.05 & abs(dat$log2FoldChange) > lfc & dat$gene_id %in% test.set & !(is.na(dat$padj)) & !(is.na(dat$log2FoldChange)), "Yes", "No")}
 	 else{
-	         dat$significant <- ifelse(dat$padj < 0.05 & abs(dat$log2FoldChange) > lfc, "Yes", "No")}
+	         dat$significant <- ifelse(dat$padj < 0.05 & abs(dat$log2FoldChange) > lfc & !(is.na(dat$padj)) & !(is.na(dat$log2FoldChange)), "Yes", "No")}
 
        nup <- nrow(dat[dat$significant=="Yes" & dat$log2FoldChange > lfc & !(is.na(dat$padj)) & !(is.na(dat$log2FoldChange)),])
        ndown <- nrow(dat[dat$significant=="Yes" & dat$log2FoldChange < (-lfc) & !(is.na(dat$padj)) & !(is.na(dat$log2FoldChange)),])
