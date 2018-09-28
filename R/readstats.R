@@ -224,7 +224,7 @@ plotContextStats <- function(df){
 		# reshape data frame
 		df.m <- melt(df)
 
-		plot1 <- ggplot(df.m, aes(x=track, y=value, fill=variable))
+		plot1 <- ggplot(df.m, aes(x=track, y=value))
 		plot2 <- plot1 + geom_bar(stat="identity")
 		plot3 <- plot2 + theme_bw()
 		plot4 <- plot3 + scale_fill_manual(values=cols)
