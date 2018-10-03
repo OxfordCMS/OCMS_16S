@@ -112,8 +112,8 @@ if (!(is.na(fnR))){
    write.table(out, file=outfile, sep="\t", row.names=F, quote=F)
    }
 
-if (is.na(fnRs)){
-   out <- filterAndTrim(fnFs, filtFs,
+if (is.na(fnR)){
+   out <- filterAndTrim(fnF, filtF,
                         truncLen=truncLen,
                         maxN=opt$`maxN`,
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
