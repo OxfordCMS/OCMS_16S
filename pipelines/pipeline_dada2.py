@@ -227,12 +227,27 @@ def addUniqueIdentifiers(infile, outfile):
     PipelineDada2.seq2id(infile,
                          outfile_map,
                          outfile)
-    
+
 #########################################
 #########################################
 #########################################
 
-@follows(addUniqueIdentifiers, mergeTaxonomyTables)
+@merge([addUniqueIdentifiers, mergeTaxonomyTables], "abundance.dir/taxa_abundances.tsv")
+def buildDefinitiveTable(infiles, outfile):
+    '''
+    build the final table with newids and
+    abundance information
+    '''
+    PipelineDada2.makeDefinitiveAbundanceFile(infiles[0].replace(".tsv", ".map"),
+                                              infiles[1],
+                                              infiles[0],
+                                              outfile)
+
+#########################################
+#########################################
+#########################################
+
+@follows(buildDefinitiveTable)
 def full():
     pass
 
