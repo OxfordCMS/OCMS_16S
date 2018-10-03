@@ -10,7 +10,7 @@ suppressPackageStartupMessages(library("futile.logger"))
 
 # make options list
 option_list <- list(
-               make_option(c("-i", "--infile"), default=NA,
+               make_option(c("-i", "--infile"), default=NA, type="character",
                            help="input fastq file [default %default]"),
                make_option(c("-f", "--filtered-directory"), default="filtered",
                            help="directory for filtered fastq files [default %default]"),
@@ -41,7 +41,7 @@ getInputFastq <- function(infile, paired){
 
 	         if (paired){
 		    fnF <- infile
-		    fnR <- gsub(".fastq.1.gz", ".fastq.2.gz", fnF)}
+		    fnR <- gsub(".fastq.1", ".fastq.2", fnF)}
 		 else{
                     fnF <- infile
 		    fnR <- NA}
@@ -79,6 +79,7 @@ truncLen <- as.numeric(splitArg(opt$`truncLen`))
 maxEE <- as.numeric(splitArg(opt$`maxEE`))
 
 # select input fastq files
+
 input.files <- getInputFastq(opt$`infile`, opt$`paired`)
 
 # input files
@@ -97,6 +98,7 @@ if (!(is.na(fnR))){
 
 flog.info(paste0("filtering reads and writing to ", opt$`filtered-directory`))
 if (!(is.na(fnR))){
+
    out <- filterAndTrim(fnF, filtF, fnR, filtR,
                         truncLen=truncLen,
                         maxN=opt$`maxN`,
