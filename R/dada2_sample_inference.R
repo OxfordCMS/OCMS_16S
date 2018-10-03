@@ -135,7 +135,7 @@ if (is.na(opt$`filtR`)){
 
    # remove chimeras
    flog.info("removing chimeric sequences")
-   mergers.nochim <- removeBimeraDenovo(dadaF.df, method="consensus")
+   mergers.nochim <- removeBimeraDenovo(mergers, method="consensus")
 
    # write out seq table
    flog.info("writing results")
