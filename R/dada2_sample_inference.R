@@ -77,7 +77,7 @@ if (is.na(opt$`filtR`)){
    # write out table
    flog.info("writing results")
    outfile <- paste(opt$`outdir`, sample.name, sep="/")
-   outfile <- paste(outfile, "_seq_abundance.tsv.gz", sep="")
+   outfile <- paste(outfile, "_seq_abundance.tsv", sep="")
    write.table(dadaF.df.nochim, file=outfile, sep="\t", quote=F, row.names=F)
 
    # write summaries
@@ -140,17 +140,17 @@ if (is.na(opt$`filtR`)){
    # write out seq table
    flog.info("writing results")
    outfile <- paste(opt$`outdir`, sample.name, sep="/")
-   outfile <- paste(outfile, "_seq_abundance.tsv.gz", sep="")
+   outfile <- paste(outfile, "_seq_abundance.tsv", sep="")
    write.table(mergers.nochim, file=outfile, sep="\t", quote=F, row.names=F)
    
    # get summaries of reads passing each stage
    flog.info("writing summaries")
    getN <- function(x) sum(getUniques(x))
-   track <- cbind(getN(dadaF), getN(dadaR), getN(mergers), rowSums(mergers.nochim))
+   track <- cbind(getN(dadaF), getN(dadaR), getN(mergers), sum(mergers.nochim$abundance))
    colnames(track) <- c("denoisedF", "denoisedR", "merged", "nonchim")
    track$sample <- sample.name
 
-   summary.outfile <- paste(opt$`oudir`, sample.name, sep="/")
+   summary.outfile <- paste(opt$`outdir`, sample.name, sep="/")
    summary.outfile <- paste(summary.outfile, "_summary.tsv", sep="")
    write.table(track, summary.outfile, sep="\t", row.names=F, quote=F)
 }
