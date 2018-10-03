@@ -152,5 +152,5 @@ if (is.na(opt$`filtR`)){
 
    summary.outfile <- paste(opt$`oudir`, sample.name, sep="/")
    summary.outfile <- paste(summary.outfile, "_summary.tsv", sep="")
-   write.table(track, summary.outfile, sep="\t", row.names=F)
+   write.table(track, summary.outfile, sep="\t", row.names=F, quote=F)
 }
