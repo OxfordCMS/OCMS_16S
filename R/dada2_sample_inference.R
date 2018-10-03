@@ -146,7 +146,7 @@ if (is.na(opt$`filtR`)){
    # get summaries of reads passing each stage
    flog.info("writing summaries")
    getN <- function(x) sum(getUniques(x))
-   track <- cbind(getN(dadaFs), getN(dadaRs), getN(mergers), rowSums(mergers.nochim))
+   track <- cbind(getN(dadaF), getN(dadaR), getN(mergers), rowSums(mergers.nochim))
    colnames(track) <- c("denoisedF", "denoisedR", "merged", "nonchim")
    track$sample <- sample.name
 
