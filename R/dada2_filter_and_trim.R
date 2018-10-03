@@ -103,8 +103,9 @@ if (!(is.na(fnRs))){
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
 	                compress=TRUE, multithread=TRUE)
    flog.info(paste0(paste0("writing summary to ", opt$`filtered-directory`), "/summary.tsv"))
+   out$sample <- rownames(out)
    outfile <- paste(opt$`filtered-directory`, "summary.tsv", sep="/")
-   write.table(out, file=outfile, sep="\t")
+   write.table(out, file=outfile, sep="\t", row.names=F, quote=F)
    }
 
 if (is.na(fnRs)){
