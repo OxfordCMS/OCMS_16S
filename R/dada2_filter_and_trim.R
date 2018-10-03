@@ -10,8 +10,8 @@ suppressPackageStartupMessages(library("futile.logger"))
 
 # make options list
 option_list <- list(
-               make_option(c("-d", "--directory"), default=".",
-                           help="directory of fastq files [default %default]"),
+               make_option(c("-i", "--infile"), default=NA,
+                           help="input fastq file [default %default]"),
                make_option(c("-f", "--filtered-directory"), default="filtered",
                            help="directory for filtered fastq files [default %default]"),
 	       make_option(c("-p", "--paired"), action="store_true", default=FALSE,
@@ -37,26 +37,26 @@ opt <- parse_args(OptionParser(option_list=option_list))
 # helper functions
 ###########################
 
-getInputFastq <- function(directory, paired){
+getInputFastq <- function(infile, paired){
 
 	         if (paired){
-		    fnFs <- sort(list.files(directory, pattern=".fastq.1", full.names = TRUE))
-		    fnRs <- sort(list.files(directory, pattern=".fastq.2", full.names = TRUE))}
+		    fnF <- infile
+		    fnR <- gsub(".fastq.1.gz", ".fastq.2.gz", fnF)}
 		 else{
-                    fnFs <- sort(list.files(directory, pattern=".fastq.1", full.names = TRUE))
-		    fnRs <- NA}
+                    fnF <- infile
+		    fnR <- NA}
 
-		 return(list(fnFs, fnRs))
+		 return(list(fnF, fnR))
 		 }
 
 ###########################
 ###########################
 ###########################
 
-getSampleNames <- function(fnFs){
+getSampleName <- function(fnF){
 
-	       sample.names <- gsub(".fastq.1", "", basename(fnFs))
-	       return(sample.names)
+	       sample.name <- gsub(".fastq.1", "", basename(fnF))
+	       return(sample.name)
 	       }
 
 ###########################
@@ -79,33 +79,34 @@ truncLen <- as.numeric(splitArg(opt$`truncLen`))
 maxEE <- as.numeric(splitArg(opt$`maxEE`))
 
 # select input fastq files
-input.files <- getInputFastq(opt$`directory`, opt$`paired`)
+input.files <- getInputFastq(opt$`infile`, opt$`paired`)
 
 # input files
-fnFs <- unlist(input.files[1])
-fnRs <- unlist(input.files[2])
+fnF <- unlist(input.files[1])
+fnR <- unlist(input.files[2])
 
 # sample names
-sample.names <- getSampleNames(fnFs)
+sample.name <- getSampleName(fnF)
 
 # filtering
-filtFs <- file.path(opt$`filtered-directory`, paste0(sample.names, ".fastq.1.gz"))
+filtF <- file.path(opt$`filtered-directory`, paste0(sample.name, ".fastq.1.gz"))
 
-if (!(is.na(fnRs))){
-   filtRs <- file.path(opt$`filtered-directory`, paste0(sample.names, ".fastq.2.gz"))
+if (!(is.na(fnR))){
+   filtR <- file.path(opt$`filtered-directory`, paste0(sample.name, ".fastq.2.gz"))
    }
 
 flog.info(paste0("filtering reads and writing to ", opt$`filtered-directory`))
-if (!(is.na(fnRs))){
-   out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,
+if (!(is.na(fnR))){
+   out <- filterAndTrim(fnF, filtF, fnR, filtR,
                         truncLen=truncLen,
                         maxN=opt$`maxN`,
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
 	                compress=TRUE, multithread=TRUE)
    flog.info(paste0(paste0("writing summary to ", opt$`filtered-directory`), "/summary.tsv"))
    out <- as.data.frame(out)
-   out$sample <- getSampleNames(rownames(out))
-   outfile <- paste(opt$`filtered-directory`, "summary.tsv", sep="/")
+   out$sample <- sample.name
+   outfile <- paste(opt$`filtered-directory`, sample.name, sep="/")
+   outfile <- paste(outfile, "summary.tsv", sep="_")
    write.table(out, file=outfile, sep="\t", row.names=F, quote=F)
    }
 
@@ -116,7 +117,8 @@ if (is.na(fnRs)){
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
 	                compress=TRUE, multithread=TRUE)
    flog.info(paste0(paste0("writing summary to ", opt$`filtered-directory`), "/summary.tsv"))
-   outfile <- paste(opt$`filtered-directory`, "summary.tsv", sep="/")
+   outfile <- paste(opt$`filtered-directory`, sample.name, sep="/")
+   outfile <- paste(outfile, "summary.tsv", sep="_")
    write.table(out, file=outfile, sep="\t")
    }
 
