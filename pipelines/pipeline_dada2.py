@@ -29,6 +29,7 @@ import logging as L
 import os
 import sys
 import glob
+import PipelineDada2 as PipelineDada2
 
 ###################################################
 ###################################################
@@ -92,19 +93,20 @@ def filterAndTrim(infile, outfile):
     infiles = [infile, infile_read2]
     
     for inf in infiles:
-        outtmp = inf.replace(".gz", "")
-        statement = '''zcat %(inf)s > %(tmpdir)s/%(outtmp)s'''
+        outtmp = os.path.join(tmpdir, inf.replace(".gz", ""))
+        statement = '''zcat %(inf)s > %(outtmp)s'''
         P.run()
-        
+
+    # hackabout
+    outtmp = os.path.join(tmpdir, [x for x in infiles if x.endswith(".fastq.1.gz")][0].replace(".gz", ""))
     statement = '''Rscript %(scriptsdir)s/dada2_filter_and_trim.R
-                   --infile=%(infile)s
-                   %(paired)s
-                   --maxN=%(maxn)s
-                   --maxEE=%(maxee)s
-                   --truncQ=%(truncQ)s
-                   --truncLen=%(truncLen)s
-                   --directory=%(tmpdir)s
-                   --filtered-directory=filtered.dir'''
+                           --infile=%(outtmp)s
+                           %(paired)s
+                           --maxN=%(maxn)s
+                           --maxEE=%(maxee)s
+                           --truncQ=%(truncQ)s
+                           --truncLen=%(truncLen)s
+                           --filtered-directory=filtered.dir'''
     P.run()
     shutil.rmtree(tmpdir)
     
@@ -151,7 +153,7 @@ def runSampleInference(infile, outfile):
 @merge(runSampleInference, "abundance.dir/merged_abundance.tsv")
 def mergeAbundanceTables(infiles, outfile):
     '''
-    combine seqquence/abundance tables across
+    combine sequence/abundance tables across
     samples
     '''
     statement = '''python %(cgatscriptsdir)s/combine_tables.py
@@ -161,9 +163,78 @@ def mergeAbundanceTables(infiles, outfile):
                    --use-file-prefix
                    -g abundance.dir/*_seq_abundance.tsv
                    --log=%(outfile)s.log
-                   | sed 's/seq_abundance.tsv//g'
+                   | sed 's/_seq_abundance.tsv//g'
                    > %(outfile)s'''
     P.run()
+    
+#########################################
+#########################################
+#########################################
+
+@follows(mkdir("taxonomy.dir"))
+@transform(runSampleInference, regex("(\S+)/(\S+)_abundance.tsv"), r"taxonomy.dir/\2_taxonomy.tsv")
+def assignTaxonomy(infile, outfile):
+    '''
+    assign taxonomy to sequences
+    '''
+    job_memory=PARAMS["taxonomy_memory"]
+    taxonomy_file = PARAMS["taxonomy_taxonomy_file"]
+    species_file = PARAMS["taxonomy_species_file"]
+
+    statement = '''Rscript %(scriptsdir)s/dada2_assign_taxonomy.R
+                   --seqfile=%(infile)s
+                   --training-set=%(taxonomy_file)s
+                   --species-file=%(species_file)s
+                   -o %(outfile)s'''
+    P.run()
+    
+###################################################
+###################################################
+###################################################
+
+@merge(assignTaxonomy, "taxonomy.dir/merged_taxonomy.tsv")
+def mergeTaxonomyTables(infiles, outfile):
+    '''
+    combine sequence/taxonomy tables across
+    samples
+    '''
+    tmpfile = P.getTempFilename()
+    statement = '''python %(cgatscriptsdir)s/combine_tables.py
+                   --skip-titles
+                   -m 0
+                   -c 1
+                   -k 2,3,4,5,6,7,8
+                   -g taxonomy.dir/*_seq_taxonomy.tsv
+                   --log=%(outfile)s.log
+                   | sed 's/_seq_taxonomy.tsv//g'
+                   | cut -f1,2,3,4,5,6,7,8
+                   > %(tmpfile)s;
+                   cat echo -e "sequence\\tKingdom\\tPhylum\\tClass\\tOrder\\tFamily\\tGenus\\tSpecies"
+                   |  cat - %(tmpfile)s > %(outfile)s;
+                   rm -rf %(tmpfile)s'''
+    P.run()
+
+###################################################
+###################################################
+###################################################
+
+@transform(mergeAbundanceTables, suffix(".tsv"), "_id.tsv")
+def addUniqueIdentifiers(infile, outfile):
+    '''
+    add unique identifiers to track the sequences
+    '''
+    outfile_map = outfile.replace(".tsv", ".map")
+    PipelineDada2.seq2id(infile,
+                         outfile_map,
+                         outfile)
+    
+#########################################
+#########################################
+#########################################
+
+@follows(addUniqueIdentifiers, mergeTaxonomyTables)
+def full():
+    pass
 
 #########################################
 #########################################
