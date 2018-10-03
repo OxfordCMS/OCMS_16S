@@ -72,13 +72,26 @@ if (is.na(opt$`filtR`)){
 
    # remove chimeras
    flog.info("removing chimeric sequences")
-   dadaF.df <- removeBimeraDenovo(dadaF.df, method="consensus")
+   dadaF.df.nochim <- removeBimeraDenovo(dadaF.df, method="consensus")
 
    # write out table
    flog.info("writing results")
    outfile <- paste(opt$`outdir`, sample.name, sep="/")
    outfile <- paste(outfile, "_seq_abundance.tsv.gz", sep="")
-   write.table(dadaF.df, file=outfile, sep="\t", quote=F, row.names=F)
+   write.table(dadaF.df.nochim, file=outfile, sep="\t", quote=F, row.names=F)
+
+   # write summaries
+   # get summaries of reads passing each stage
+   flog.info("writing summaries")
+   getN <- function(x) sum(getUniques(x))
+   track <- cbind(getN(dadaF), getN(dadaF.nochim))
+   colnames(track) <- c("denoisedF", "nonchim")
+   track$sample <- sample.name
+
+   summary.outfile <- paste(opt$`oudir`, sample.name, sep="/")
+   summary.outfile <- paste(summary.outfile, "_summary.tsv", sep="")
+   write.table(track, summary.outfile, sep="\t", row.names=F)
+
 
 } else {
 
@@ -104,14 +117,40 @@ if (is.na(opt$`filtR`)){
    dadaF <- dada(derepF, err=errF, multithread=TRUE)
    dadaR <- dada(derepR, err=errR, multithread=TRUE)
 
-   # merge pairs
+   # merge pairs - returns a dataframe
+   flog.info("merging paired reads")
    mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE)
+
+   mergers <- data.frame(sequence=mergers$sequence,
+   	                 abundance=mergers$abundance,
+			 forward=mergers$forward,
+			 reverse=mergers$reverse,
+			 nmatch=mergers$nmatch,
+			 nmismatch=mergers$nmismatch,
+			 nindel=mergers$nindel,
+			 prefer=mergers$prefer,
+			 accept=mergers$accept)
+
+   mergers <- mergers[mergers$accept==TRUE,]
+
+   # remove chimeras
+   flog.info("removing chimeric sequences")
+   mergers.nochim <- removeBimeraDenovo(dadaF.df, method="consensus")
 
    # write out seq table
    flog.info("writing results")
    outfile <- paste(opt$`outdir`, sample.name, sep="/")
    outfile <- paste(outfile, "_seq_abundance.tsv.gz", sep="")
-   write.table(mergers, file=outfile, sep="\t", quote=F, row.names=F)
-   }
+   write.table(mergers.nochim, file=outfile, sep="\t", quote=F, row.names=F)
    
-   
+   # get summaries of reads passing each stage
+   flog.info("writing summaries")
+   getN <- function(x) sum(getUniques(x))
+   track <- cbind(getN(dadaFs), getN(dadaRs), getN(mergers), rowSums(mergers.nochim))
+   colnames(track) <- c("denoisedF", "denoisedR", "merged", "nonchim")
+   track$sample <- sample.name
+
+   summary.outfile <- paste(opt$`oudir`, sample.name, sep="/")
+   summary.outfile <- paste(summary.outfile, "_summary.tsv", sep="")
+   write.table(track, summary.outfile, sep="\t", row.names=F)
+}
