@@ -254,5 +254,30 @@ def full():
 #########################################
 #########################################
 #########################################
+
+@follows(mkdir("report.dir"))
+def buildReport():
+    '''
+    render the rmarkdown report file
+    '''
+    reportdir = PARAMS["report_directory"]
+    author = PARAMS["report_author"]
+    title = PARAMS["report_title"]
+    
+    # copy files to report directory
+    statement = '''cd report.dir; cp %(reportdir)s/*.Rmd .; cd ../'''
+    P.run()
+
+    # add report_author and report_title
+    statement = '''sed -i 's/report_author/%(author)s/g' report.dir/report.Rmd;
+                   sed -i 's/report_title/%(title)s/g' report.dir/report.Rmd'''
+    P.run()
+
+    # render the report
+#    statement = '''cd report.dir; '''
+
+#########################################
+#########################################
+#########################################
 if __name__ == "__main__":
     sys.exit(P.main(sys.argv))
