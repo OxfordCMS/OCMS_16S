@@ -1,0 +1,53 @@
+---
+title: "dada2 filtering results"
+header-includes: #allows you to add in your own Latex packages
+- \usepackage{float} #use the 'float' package
+- \floatplacement{figure}{H} #make every figure with caption = h
+
+output:
+  pdf_document:
+    fig_caption: true
+    keep_tex: true
+    latex_engine: pdflatex
+  html_document:
+    df_print: paged
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.extra = '')
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_knit$set(root.dir = "../")
+```
+# dada2 filtering reads
+
+The first stage of the dada2 pipeline is filtering and trimming of reads. The number of reads
+that remain for downstream analysis is dependent on the parameters that were set for filtering
+and trimming. In most cases it would be expected that the vast majority of reads will remain
+after this step. It is noteworthy that dada2 does not accept any "N" bases and so will remove
+reads if there is an N in the sequence.
+
+```{r include=FALSE, echo=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+```
+
+## Number of reads input/output during filtering and trimming
+
+Below is a summary of the number of input reads and the number of output reads for each sample.
+
+```{r filtering, fig.cap='Number of input and output reads during filtering step', fig.height=5, fig.width=8,  echo=FALSE, message=FALSE}
+
+infiles = list.file()[grep("filtered.dir/*summary.tsv")]
+dfs <- list()
+for (i in 1:length(infiles)){
+    dfs[i] <- read.csv(infiles[i], headerr=T, stringsAsFactors=F, sep="\t")
+}
+
+
+
+```
