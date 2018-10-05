@@ -5,12 +5,6 @@ header-includes:
 - \floatplacement{figure}{H}
 
 output:
-  pdf_document:
-    fig_caption: yes
-    keep_tex: yes
-    latex_engine: xelatex
-    number_sections: yes
-
   html_document:
     df_print: paged
 urlcolor: blue

@@ -282,9 +282,9 @@ def build_report():
     title = '"' + PARAMS["report_title"] + '"'
 
     # cp a file as error model - random one really
-    errF_files = glob.glob("filtered.dir/*.errF.pdf")
+    errF_files = glob.glob("filtered.dir/*errF.png")
     errF = errF_files[0]
-    statement = '''cp %(errF)s report.dir/*errF.pdf'''
+    statement = '''cp %(errF)s report.dir/errF.png'''
     P.run()
     
     # copy files to report directory
@@ -294,6 +294,10 @@ def build_report():
     # add report_author and report_title
     statement = '''sed -i 's/report_author/%(author)s/g' report.dir/report.Rmd;
                    sed -i 's/report_title/%(title)s/g' report.dir/report.Rmd'''
+    P.run()
+
+    # add report_title
+    statement = '''sed -i 's/report_title/%(title)s/g' report.dir/pipeline_dada2.Rmd'''
     P.run()
 
     # render the report

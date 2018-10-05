@@ -54,8 +54,8 @@ if (is.na(opt$`filtR`)){
    errF <- learnErrors(opt$`filtF`, multithread=TRUE, nreads=opt$`nreads`)
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
-   filename <- paste(paste(directory, sample.name, sep="/"), "errF.pdf", sep="_")
-   ggsave(filename, height=10, width=10)
+   filename <- paste(paste(directory, sample.name, sep="/"), "errF.png", sep="_")
+   ggsave(filename)
 
    # dereplication
    flog.info("dereplication")
@@ -101,11 +101,11 @@ if (is.na(opt$`filtR`)){
 
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
-   filename <- paste(paste(directory, sample.name, sep="/"), "errF.pdf", sep="_")
+   filename <- paste(paste(directory, sample.name, sep="/"), "errF.png", sep="_")
    ggsave(filename, height=10, width=10)
    p <- plotErrors(errR, nominalQ=TRUE)
-   filename <- paste(paste(directory, sample.name, sep="/"), "errR.pdf", sep="_")
-   ggsave(filename, height=10, width=10)
+   filename <- paste(paste(directory, sample.name, sep="/"), "errR.png", sep="_")
+   ggsave(filename)
 
    # dereplication
    flog.info("dereplication")

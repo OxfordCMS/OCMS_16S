@@ -1,5 +1,5 @@
 ---
-title: "dada2 filtering results"
+title: "dada2 analysis"
 header-includes: #allows you to add in your own Latex packages
 - \usepackage{float} #use the 'float' package
 - \floatplacement{figure}{H} #make every figure with caption = h
@@ -12,6 +12,8 @@ output:
   html_document:
     df_print: paged
 urlcolor: blue
+
+graphics: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +24,32 @@ knitr::opts_chunk$set(out.extra = '')
 #knitr::opts_chunk$set(fig.pos = 'H')
 knitr::opts_knit$set(root.dir = "../")
 ```
-# dada2 filtering reads
+
+# report_title
+
+
+## Sample mapping
+
+When there are lots of samples with complicated samplenames the rendering of this document is
+suboptimal. To mitigate unwanted visual effects (somewhat) we map each sample to a unique number
+that is plotted on each graph - the map is below for linking what you see in the plots to the
+sample names.
+
+```{r samplemap, echo=FALSE}
+
+library(knitr)
+samples <- list.files(pattern="*.fastq.1.gz")
+samples <- gsub(".fastq.1.gz", "", samples)
+
+ids <- as.character(seq(1, length(samples),1))
+sample.map <- data.frame(sample=samples, reportId=ids)
+rownames(sample.map) <- as.character(sample.map$sample)
+
+kable(sample.map, row.names=FALSE)
+
+```
+
+## dada2 filtering reads
 
 The first stage of the dada2 pipeline is filtering and trimming of reads. The number of reads
 that remain for downstream analysis is dependent on the parameters that were set for filtering
@@ -38,7 +65,7 @@ library(reshape)
 library(gplots)
 ```
 
-## Number of reads input/output during filtering and trimming
+### Number of reads input/output during filtering and trimming
 
 Below is a summary of the number of input reads and the number of output reads for each sample.
 
@@ -64,6 +91,8 @@ for (i in 1:length(infiles)){
 }
 names(dfs) <- names.list
 df <- bind_rows(dfs)
+x <- sample.map[df$sample,]$reportId
+df$sample <- x
 
 ################################################
 # define reads.in as the difference between the
@@ -100,8 +129,8 @@ speed up data processing. This also means that we produce a plot for each sample
 all here and so we just inspect one for the report purposes but all others are available where the piepline was run. Note that
 at the moment this is restricted to the forward reads (so there is no error thrown when using single end data).
 
-![Alt](errF.pdf)
 
+![Error model](errF.png)
 
 ## De-replication, sample inference, merging and chimera removal
 
@@ -134,6 +163,8 @@ for (i in 1:length(infiles)){
 }
 names(dfs) <- names.list
 df <- bind_rows(dfs)
+x <- sample.map[df$sample,]$reportId
+df$sample <- x
 
 # reshape and plot
 df.m <- melt(df)
@@ -152,9 +183,10 @@ The next stage is to assign each of the amplicon sequence variants (ASV) to a ta
 were identified in each sample and the taxonomic groups found among them.
 
 
-```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=5, fig.width=8,  echo=FALSE, message=FALSE}
+```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=5, fig.width=12,  echo=FALSE, message=FALSE}
 
 dat <- read.csv("abundance.dir/taxa_abundances.tsv", header=T, stringsAsFactors=F, sep="\t", row.names=1)
+colnames(dat) <- sample.map[gsub("\\.", "-", colnames(dat)),]$reportId
 
 nasvs <- data.frame(colSums(dat > 0))
 nasvs$sample <- rownames(nasvs)
@@ -171,25 +203,8 @@ p5 <- p4 + ylab("number of ASVs")
 # combine at different levels down to genus
 
 p <- gsub(";c__.*", "", rownames(dat))
-p <- gsub("ASV[0-9]*:", "", phylum)
-
-c <- gsub(";o__.*", "", rownames(dat))
-c <- gsub("ASV[0-9]*:p__.*;", "",  c)
-
-o <- gsub(";f__.*", "", rownames(dat))
-o <- gsub("ASV[0-9]*:p__.*;c__.*;", "",  o)
-
-f <- gsub(";g__.*", "", rownames(dat))
-f <- gsub("ASV[0-9]*:p__.*;c__.*;o__.*;", "",  f)
-
-g <- gsub(";s__.*", "", rownames(dat))
-g <- gsub("ASV[0-9]*:p__.*;c__.*;o__.*;f__.*;", "",  g)
-
-dp <- melt(aggregate(dat, by=list(p), sum))
-dc <- melt(aggregate(dat, by=list(c), sum))
-do <- melt(aggregate(dat, by=list(o), sum))
-df <- melt(aggregate(dat, by=list(f), sum))
-dg <- melt(aggregate(dat, by=list(g), sum))
+p <- gsub("ASV[0-9]*:", "", p)
+dp <- melt(aggregate(dat, list(p), sum))
 
 plotBar <- function(x){
 	p1 <- ggplot(x, aes(x=variable, y=value, fill=Group.1))
@@ -201,10 +216,6 @@ plotBar <- function(x){
 	}
 
 p6 <- plotBar(dp)
-# p7 <- plotBar(dc)
-# p8 <- plotBar(do)
-# p9 <- plotBar(df)
-# p10 <- plotBar(dg)
 
 grid.arrange(p5,p6, ncol=2, nrow=1)
 
