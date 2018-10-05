@@ -247,7 +247,24 @@ def buildDefinitiveTable(infiles, outfile):
 #########################################
 #########################################
 
-@follows(buildDefinitiveTable)
+@follows(mkdir("taxonomy_abundances.dir"))
+@split(buildDefinitiveTable, "taxonomy_abundances.dir/*_abundance.tsv")
+def splitTableByTaxonomicLevels(infile, outfiles):
+    '''
+    split the table at different taxonomic levels and
+    sum counts for each member of that level
+    '''
+    statement = '''Rscript %(scriptsdir)s/dada2_split_levels.R
+                   --outdir=taxonomy_abundances.dir
+                   -i %(infile)s
+                   --scriptsdir=%(scriptsdir)s''' 
+    P.run()
+
+#########################################
+#########################################
+#########################################
+
+@follows(splitTableByTaxonomicLevels)
 def full():
     pass
 
@@ -256,13 +273,19 @@ def full():
 #########################################
 
 @follows(mkdir("report.dir"))
-def buildReport():
+def build_report():
     '''
     render the rmarkdown report file
     '''
     reportdir = PARAMS["report_directory"]
-    author = PARAMS["report_author"]
-    title = PARAMS["report_title"]
+    author = '"' + PARAMS["report_author"] + '"'
+    title = '"' + PARAMS["report_title"] + '"'
+
+    # cp a file as error model - random one really
+    errF_files = glob.glob("filtered.dir/*.errF.pdf")
+    errF = errF_files[0]
+    statement = '''cp %(errF)s report.dir/*errF.pdf'''
+    P.run()
     
     # copy files to report directory
     statement = '''cd report.dir; cp %(reportdir)s/*.Rmd .; cd ../'''
@@ -274,8 +297,9 @@ def buildReport():
     P.run()
 
     # render the report
-#    statement = '''cd report.dir; '''
-
+    statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i report.Rmd; cd ../'''
+    P.run()
+    
 #########################################
 #########################################
 #########################################
