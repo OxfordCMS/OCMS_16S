@@ -321,7 +321,6 @@ def mergeTaxonomyTables(infiles, outfile):
     combine sequence/taxonomy tables across
     samples
     '''
-    tmpfile = P.get_temp_filename()
     statement = '''cgat combine_tables
                    --skip-titles
                    -m 0
@@ -331,10 +330,9 @@ def mergeTaxonomyTables(infiles, outfile):
                    --log=%(outfile)s.log
                    | sed 's/_seq_taxonomy.tsv//g'
                    | cut -f1,2,3,4,5,6,7,8
-                   > %(tmpfile)s;
-                   echo -e "sequence\\tKingdom\\tPhylum\\tClass\\tOrder\\tFamily\\tGenus\\tSpecies"
-                   |  cat - %(tmpfile)s > %(outfile)s;
-                   rm -rf %(tmpfile)s'''
+                   > %(outfile)s
+                '''
+
     P.run(statement)
 
 ###################################################
@@ -380,7 +378,7 @@ def splitTableByTaxonomicLevels(infile, outfiles):
     statement = '''Rscript %(scriptsdir)s/dada2_split_levels.R
                    --outdir=taxonomy_abundances.dir
                    -i %(infile)s
-                   --scriptsdir=%(scriptsdir)s''' 
+                ''' 
     P.run(statement)
 
 #########################################
