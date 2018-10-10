@@ -332,7 +332,7 @@ def mergeTaxonomyTables(infiles, outfile):
                    | sed 's/_seq_taxonomy.tsv//g'
                    | cut -f1,2,3,4,5,6,7,8
                    > %(tmpfile)s;
-                   cat echo -e "sequence\\tKingdom\\tPhylum\\tClass\\tOrder\\tFamily\\tGenus\\tSpecies"
+                   echo -e "sequence\\tKingdom\\tPhylum\\tClass\\tOrder\\tFamily\\tGenus\\tSpecies"
                    |  cat - %(tmpfile)s > %(outfile)s;
                    rm -rf %(tmpfile)s'''
     P.run(statement)
