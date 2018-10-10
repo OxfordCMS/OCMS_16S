@@ -32,7 +32,16 @@ Installation
 -------------
 
 You should install CGAT tools using the installation script that is provided, this will
-install everything you need into a conda environment. However it does not come with dada2
+install everything you need into a conda environment. 
+
+.. warning::
+
+    Make sure that you are installing CGAT into a clean environment i.e. with no modules
+    loaded from shared directories. You can do something like module purge to remove loaded
+    modules.
+
+
+However it does not come with dada2
 installed and so once you have activated the CGAT environment you should install the dada2
 R package as follows::
 
