@@ -1,0 +1,43 @@
+
+# specify whether data are paired or single end. The
+# pipeline will pick up whether this is true but being
+# explicit here is helpful
+paired: 1
+
+scriptsdir: /gfs/devel/nilott/NGSKit/R
+
+cgatscriptsdir: /gfs/devel/nilott/cgat-developers-v0/cgat-apps/CGAT/tools
+
+trim:
+
+    # parameters used for trimming reads. If the data are
+    # paired-end then you need to specify 2 values for
+    # maxee and truncLen. These parameters must be specified
+    maxn: 0
+    maxee: 2,2
+    truncq: 2
+    trunclen: 250,160
+
+sample_inference:
+
+    # paramters for sample inference. This includes
+    # error learning, de-replication, merging (if paired) and
+    # sample inference.
+
+    # number of reads to use (per sample) to estimate error
+    # model
+    nreads: 50000
+
+taxonomy:
+
+    memory: 10G
+
+    # assigning taxonomy
+    taxonomy_file: /gfs/mirror/dada2/silva_nr_v132_train_set.fa.gz
+    species_file: /gfs/mirror/dada2/silva_species_assignment_v132.fa.gz
+
+report:
+
+    directory: /gfs/devel/nilott/NGSKit/pipelines/docs/Rmd/pipeline_dada2
+    author: Nick Ilott
+    title: Calprotectin project
