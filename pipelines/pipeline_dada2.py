@@ -64,9 +64,10 @@ data and two files <name>.fastq.1.gz and <name>.fastq.2.gz for paired-end data.
 Parameterisation
 ------------------
 
-There is a pipeline.ini file that specifies the parameters to be passed to dada2 and reporting
-functions in the pipeline. This is located in <path-to-NGSKit>/pipelines/pipeline_dada2/pipeline.ini.
-The parameters are explained in the dada2 `tutorial`_.
+There is a pipeline.yml file that specifies the parameters to be passed to dada2 and reporting
+functions in the pipeline. This is located in <path-to-NGSKit>/pipelines/pipeline_dada2/pipeline.yml
+and needs to be copied to your working directory. The parameters should be changed to suitable values.
+and are explained in the dada2 `tutorial`_. 
 
 .. _tutorial: https://benjjneb.github.io/dada2/tutorial.html
 
@@ -126,8 +127,18 @@ Code
 # load modules
 from ruffus import *
 
-import CGAT.Experiment as E
-import CGATPipelines.Pipeline as P
+try:
+    import CGAT.Experiment as E
+except ImportError:
+    print("CGAT module not available, using CGATCore instead")
+    import CGATCore.Experiment as E
+
+try: 
+    import CGATPipelines.Pipeline as P
+except ImportError:
+    print("CGAT module not available, using CGATCore instead")
+    import CGATCore.Pipeline as P
+    
 import shutil
 import logging as L
 import os
@@ -142,9 +153,8 @@ import PipelineDada2 as PipelineDada2
 ###################################################
 
 # load options from the config file
-import CGATPipelines.Pipeline as P
-P.getParameters(
-    ["pipeline.ini"])
+P.get_parameters(
+    ["pipeline.yml"])
 
 PARAMS = P.PARAMS
 
@@ -190,7 +200,7 @@ def filterAndTrim(infile, outfile):
     else:
         paired = ""
 
-    tmpdir = P.getTempDir()
+    tmpdir = P.get_temp_dir()
 
     # unzip one by one
     infile_read2 = infile.replace(".fastq.1.gz", ".fastq.2.gz")
@@ -199,7 +209,7 @@ def filterAndTrim(infile, outfile):
     for inf in infiles:
         outtmp = os.path.join(tmpdir, inf.replace(".gz", ""))
         statement = '''zcat %(inf)s > %(outtmp)s'''
-        P.run()
+        P.run(statement)
 
     # hackabout
     outtmp = os.path.join(tmpdir, [x for x in infiles if x.endswith(".fastq.1.gz")][0].replace(".gz", ""))
@@ -211,7 +221,7 @@ def filterAndTrim(infile, outfile):
                            --truncQ=%(truncQ)s
                            --truncLen=%(truncLen)s
                            --filtered-directory=filtered.dir'''
-    P.run()
+    P.run(statement)
     shutil.rmtree(tmpdir)
     
 ###################################################
@@ -248,7 +258,7 @@ def runSampleInference(infile, outfile):
                        --nreads=%(nreads)s
                        --outdir=%(outdir)s'''
 
-    P.run()
+    P.run(statement)
 
 ###################################################
 ###################################################
@@ -269,7 +279,7 @@ def mergeAbundanceTables(infiles, outfile):
                    --log=%(outfile)s.log
                    | sed 's/_seq_abundance.tsv//g'
                    > %(outfile)s'''
-    P.run()
+    P.run(statement)
     
 #########################################
 #########################################
@@ -290,7 +300,7 @@ def assignTaxonomy(infile, outfile):
                    --training-set=%(taxonomy_file)s
                    --species-file=%(species_file)s
                    -o %(outfile)s'''
-    P.run()
+    P.run(statement)
     
 ###################################################
 ###################################################
@@ -302,7 +312,7 @@ def mergeTaxonomyTables(infiles, outfile):
     combine sequence/taxonomy tables across
     samples
     '''
-    tmpfile = P.getTempFilename()
+    tmpfile = P.get_temp_filename()
     statement = '''python %(cgatscriptsdir)s/combine_tables.py
                    --skip-titles
                    -m 0
@@ -316,7 +326,7 @@ def mergeTaxonomyTables(infiles, outfile):
                    cat echo -e "sequence\\tKingdom\\tPhylum\\tClass\\tOrder\\tFamily\\tGenus\\tSpecies"
                    |  cat - %(tmpfile)s > %(outfile)s;
                    rm -rf %(tmpfile)s'''
-    P.run()
+    P.run(statement)
 
 ###################################################
 ###################################################
@@ -362,7 +372,7 @@ def splitTableByTaxonomicLevels(infile, outfiles):
                    --outdir=taxonomy_abundances.dir
                    -i %(infile)s
                    --scriptsdir=%(scriptsdir)s''' 
-    P.run()
+    P.run(statement)
 
 #########################################
 #########################################
@@ -389,24 +399,24 @@ def build_report():
     errF_files = glob.glob("filtered.dir/*errF.png")
     errF = errF_files[0]
     statement = '''cp %(errF)s report.dir/errF.png'''
-    P.run()
+    P.run(statement)
     
     # copy files to report directory
     statement = '''cd report.dir; cp %(reportdir)s/*.Rmd .; cd ../'''
-    P.run()
+    P.run(statement)
 
     # add report_author and report_title
     statement = '''sed -i 's/report_author/%(author)s/g' report.dir/report.Rmd;
                    sed -i 's/report_title/%(title)s/g' report.dir/report.Rmd'''
-    P.run()
+    P.run(statement)
 
     # add report_title
     statement = '''sed -i 's/report_title/%(title)s/g' report.dir/pipeline_dada2.Rmd'''
-    P.run()
+    P.run(statement)
 
     # render the report
     statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i report.Rmd; cd ../'''
-    P.run()
+    P.run(statement)
     
 #########################################
 #########################################
