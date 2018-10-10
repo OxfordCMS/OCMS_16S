@@ -279,7 +279,7 @@ def mergeAbundanceTables(infiles, outfile):
     combine sequence/abundance tables across
     samples
     '''
-    statement = '''python %(cgatscriptsdir)s/combine_tables.py
+    statement = '''cgat combine_tables
                    -m 0
                    -c 1
                    -k 2
@@ -322,7 +322,7 @@ def mergeTaxonomyTables(infiles, outfile):
     samples
     '''
     tmpfile = P.get_temp_filename()
-    statement = '''python %(cgatscriptsdir)s/combine_tables.py
+    statement = '''cgat combine_tables
                    --skip-titles
                    -m 0
                    -c 1
