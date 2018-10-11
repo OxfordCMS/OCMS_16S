@@ -34,18 +34,25 @@ Installation
 You should install CGAT tools using the installation script that is provided, this will
 install everything you need into a conda environment. 
 
+To activate the enviroment do the following::
+
+    source </full/path/to/folder/without/trailing/slash>/conda-install/etc/profile.d/conda.sh
+    conda activate base
+    conda activate cgat-f
+
+    # finally, please run the cgatflow command-line tool to check the installation:
+    cgatflow --help
+
 .. warning::
 
     Make sure that you are installing CGAT into a clean environment i.e. with no modules
     loaded from shared directories. You can do something like module purge to remove loaded
     modules.
 
+However it does not come with dada2 installed and so once you have activated the CGAT environment
+you should install the dada2 R package as follows::
 
-However it does not come with dada2
-installed and so once you have activated the CGAT environment you should install the dada2
-R package as follows::
-
-    conda install bioconductor-dada2
+    conda install -c bioconda bioconductor-dada2
 
 This should install dada2 so that when you start R you can simply type::
 
@@ -140,13 +147,13 @@ try:
     import CGAT.Experiment as E
 except ImportError:
     print("CGAT module not available, using CGATCore instead")
-    import CGATCore.Experiment as E
+    import cgatcore.experiment as E
 
 try: 
     import CGATPipelines.Pipeline as P
 except ImportError:
     print("CGAT module not available, using CGATCore instead")
-    import CGATCore.Pipeline as P
+    import cgatcore.pipeline as P
     
 import shutil
 import logging as L
