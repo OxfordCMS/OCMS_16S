@@ -58,7 +58,12 @@ This should install dada2 so that when you start R you can simply type::
 
     library("dada2")
 
-Once you have successfully installed CGAT and dada2 you should then download the NGSKit
+
+You will in all likelihood also have to install optparse for argument parsing in the R scripts::
+
+    conda install -c conda-forge r-optparse
+
+Once you have successfully installed CGAT, dada2 and optparse, you should then download the NGSKit
 repository - this contains the dada2 pipeline (/pipelines/pipeline_dada2.py). In a development
 folder run::
   
