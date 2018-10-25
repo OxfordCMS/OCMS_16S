@@ -266,3 +266,21 @@ MAPlot <- function(res, lfc=1, test.in=F, test.set, title="default title"){
        return (plot10)
        }
 
+
+#########################################
+#########################################
+# transformations
+#########################################
+#########################################
+
+log2cpm <- function(counts){
+
+	cpm <- log2(sweep(counts, 2, colSums(counts)/1000000, "/") + 1)
+	return(cpm)
+	}
+
+relab <- function(counts){
+
+      relab <- (sweep(counts, 2, colSums(counts), "/"))*100
+      return(relab)
+      }
