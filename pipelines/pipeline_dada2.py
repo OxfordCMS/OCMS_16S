@@ -49,15 +49,18 @@ To activate the enviroment do the following::
     loaded from shared directories. You can do something like module purge to remove loaded
     modules.
 
-However it does not come with dada2 installed and so once you have activated the CGAT environment
-you should install the dada2 R package as follows::
+However it does not come with dada2 installed. Dada2 requires RcppParallel to be installed so
+first, so once you have activated the CGAT environment install this::
+
+    conda install -c conda-forge r-rcppparallel 
+
+Then you should install the dada2 R package as follows::
 
     conda install -c bioconda bioconductor-dada2
 
 This should install dada2 so that when you start R you can simply type::
 
     library("dada2")
-
 
 You will in all likelihood also have to install optparse for argument parsing in the R scripts::
 
