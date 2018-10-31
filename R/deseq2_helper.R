@@ -72,7 +72,7 @@ plotGOI <- function(mat, goi=""){
 	df <- data.frame(t(dat))
 	df$cond <- conds
 	plot1 <- ggplot(df, aes_string(x="cond", y=goi, colour="cond"))
-	plot2 <- plot1 + geom_boxplot()
+	plot2 <- plot1 + geom_boxplot(outlier.alpha=0)
 	plot3 <- plot2 + geom_jitter()
 	plot4 <- plot3 + theme_bw()
 	plot5 <- plot4 + ggtitle(goi)
