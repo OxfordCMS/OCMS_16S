@@ -15,6 +15,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../../pipelines'))
+sys.path.insert(0, os.path.abspath('../../../../cgat-developers-v0/cgat-core/cgatcore'))
 
 
 # -- Project information -----------------------------------------------------
