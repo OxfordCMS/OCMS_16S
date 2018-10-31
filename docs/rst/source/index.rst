@@ -10,7 +10,8 @@ Welcome to pipeline_dada2's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+   doc
+	     
 Indices and tables
 ==================
 
@@ -18,8 +19,6 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. automodule:: pipeline_dada2
-   :members:
 
 
 
