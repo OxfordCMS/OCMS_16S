@@ -85,8 +85,7 @@ def main(argv=None):
             # don't need both reads in pairs for sample ids
             files = files[0::2]
         else:
-            files = data[-(options.nlanes):]
-
+            files = data[-(options.nlanes/2):]
 
         ids = ["_".join(x.split("_")[0:3]) for x in files]
         
