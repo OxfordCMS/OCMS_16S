@@ -34,7 +34,7 @@ Command line options
 
 import sys
 import os
-import CGAT.Experiment as E
+import cgatcore.experiment as E
 import glob
 
 
@@ -59,7 +59,7 @@ def reformat(infile):
     '''
     total = getTotalCount(infile)
     inf = open(infile)
-    sample = inf.readline()[:-1].split("\t")[1]
+    sample = os.path.basename(inf.readline()[:-1].split("\t")[1])
     for line in inf.readlines():
         data = line[:-1].split("\t")
         proportion = (float(data[1])/total)*100
@@ -82,7 +82,7 @@ def main(argv=None):
                       help="supply directory where the input summaries aer located")
     
     # add common options (-h/--help, ...) and parse command line
-    (options, args) = E.Start(parser, argv=argv)
+    (options, args) = E.start(parser, argv=argv)
 
     infiles = glob.glob(os.path.join(options.directory, "*/*genes*summary*"))
     sys.stdout.write("category\tnreads\tpreads\tsample\n")
@@ -90,7 +90,7 @@ def main(argv=None):
         reformat(infile)
 
     # write footer and output benchmark information.
-    E.Stop()
+    E.stop()
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
