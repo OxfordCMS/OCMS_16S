@@ -6,6 +6,7 @@
 ##################################################
 ##################################################
 
+import re
 
 def seq2id(seqtable, outfile_map, outfile_table):
     '''
@@ -29,6 +30,40 @@ def seq2id(seqtable, outfile_map, outfile_table):
     out_map.close()
     out_table.close()
         
+##################################################
+##################################################
+##################################################
+
+def mergeTaxonomyTables(infiles, outfile):
+    '''
+    merge taxonomy files
+    '''
+    taxonomy = {}
+    for infile in infiles:
+        inf = open(infile)
+        inf.readline()
+        for line in inf.readlines():
+            data = line[:-1].split("\t")
+            seq, tax = data[0], [data[1], data[2], data[3], data[4], data[5], data[6], data[8]]
+
+            # remove the __ in names - will allow consistency
+            # downstream
+            tax = [re.sub(r"\S__", "", x) for x in tax]
+
+            # replace missing data with NA
+            tax = ["NA" if x=='' else x for x in tax]
+
+            # check there are the correct number of elements
+            assert len(tax) == 7, "Not enough levels in %s" % ", ".join(tax)
+            taxonomy[seq] = tax
+
+    outf = open(outfile, "w")
+    outf.write("sequence\tKingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies\n")
+    for seq, taxa in taxonomy.items():
+        outf.write(seq + "\t" + "\t".join(taxa) + "\n")
+    outf.close()
+
+
 ##################################################
 ##################################################
 ##################################################

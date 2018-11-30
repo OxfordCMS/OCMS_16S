@@ -38,25 +38,25 @@ buildPerLevelTable <- function(taxa_abundances, level="phylum"){
    		           d <- aggregate(dat, by=list(p), sum)}
                        else if (level == "class"){
 			   c <- gsub(";o__.*", "", rownames(dat))
-  		           c <- gsub("ASV[0-9]*:p__.*;", "",  c)
+  		           c <- gsub("ASV[0-9]*:", "",  c)
                            d <- aggregate(dat, by=list(c), sum)}
                        else if (level == "order"){
                            o <- gsub(";f__.*", "", rownames(dat))
-		           o <- gsub("ASV[0-9]*:p__.*;c__.*;", "",  o)
+		           o <- gsub("ASV[0-9]*:", "",  o)
                            d <- aggregate(dat, by=list(o), sum)}
 		       else if (level == "family"){
                            f <- gsub(";g__.*", "", rownames(dat))
-		           f <- gsub("ASV[0-9]*:p__.*;c__.*;o__.*;", "",  f)
+		           f <- gsub("ASV[0-9]*:", "",  f)
                            d <- aggregate(dat, by=list(f), sum)}
 		       else if (level == "genus"){
 		           g <- gsub(";s__.*", "", rownames(dat))
-		           g <- gsub("ASV[0-9]*:p__.*;c__.*;o__.*;f__.*;", "",  g)
+		           g <- gsub("ASV[0-9]*:", "",  g)
                            d <- aggregate(dat, by=list(g), sum)}
 		       else if (level == "species"){
 		           s <- gsub(".*;", "", rownames(dat))
 		           g <- gsub(";s__.*", "", rownames(dat))
-		           g <- gsub("ASV[0-9]*:p__.*;c__.*;o__.*;f__.*;", "",  g)
-			   s <- gsub("g__", "s__", gsub("s__", "", paste(g, s, sep="_")))
+		           g <- gsub("ASV[0-9]*:", "",  g)
+			   s <- paste(g, s, sep=";")
                            d <- aggregate(dat, by=list(s), sum)}
                    }
 		   else{
