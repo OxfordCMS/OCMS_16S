@@ -336,20 +336,8 @@ def mergeTaxonomyTables(infiles, outfile):
     combine sequence/taxonomy tables across
     samples
     '''
-    statement = '''cgat combine_tables
-                   --skip-titles
-                   -m 0
-                   -c 1
-                   -k 2,3,4,5,6,7,8
-                   -g taxonomy.dir/*_seq_taxonomy.tsv
-                   --log=%(outfile)s.log
-                   | sed 's/_seq_taxonomy.tsv//g'
-                   | cut -f1,2,3,4,5,6,7,8
-                   > %(outfile)s
-                '''
-
-    P.run(statement)
-
+    PipelineDada2.mergeTaxonomyTables(infiles, outfile)
+    
 ###################################################
 ###################################################
 ###################################################
