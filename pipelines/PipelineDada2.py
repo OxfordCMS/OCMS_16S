@@ -44,7 +44,7 @@ def mergeTaxonomyTables(infiles, outfile):
         inf.readline()
         for line in inf.readlines():
             data = line[:-1].split("\t")
-            seq, tax = data[0], [data[1], data[2], data[3], data[4], data[5], data[6], data[8]]
+            seq, tax = data[0], [data[1], data[2], data[3], data[4], data[5], data[6], data[7]]
 
             # remove the __ in names - will allow consistency
             # downstream
