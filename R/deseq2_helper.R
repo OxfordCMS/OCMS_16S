@@ -50,6 +50,21 @@ getResultsTable <- function(res, featureData){
 	return(results)
 	}
 
+getExpressed <- function(mat){
+
+	     # return data frame of number of genes
+	     # expressed at different sample levels
+
+	     nsamples <- ncol(mat)
+	     ngenes <- c()
+	     for (i in seq(1, nsamples, 1)){
+	     	 n <- nrow(mat[rowSums(mat > 0) == i,])
+		 ngenes <- append(ngenes, n)
+             }
+	     df <- data.frame(nsamples=seq(1, nsamples, 1), ngenes=ngenes)
+	     return(df)
+	     }
+
 plotMeanSd <- function(mat){
 
 		 means <- rowMeans(mat)
