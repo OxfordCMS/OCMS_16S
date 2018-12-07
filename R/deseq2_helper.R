@@ -12,6 +12,14 @@ library(RSQLite)
 # making conditions and features
 #################################
 
+filterGenes <- function(mat, a, k){
+
+       # filter based on a samples over k counts
+       mat <- mat[rowSums(mat >= k) >= a,]
+       return(mat)
+       }
+
+
 makeConds <- function(samples){
 	  
 	    conditions <- unlist(strsplit(samples, "\\."))
