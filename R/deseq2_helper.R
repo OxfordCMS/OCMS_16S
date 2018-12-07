@@ -40,6 +40,21 @@ makeFeatureData <- function(db, mat){
 		return (featuredata)
 		}
 
+makeBiotypeData <- function(db, mat){
+
+		sqlite <- dbDriver("SQLite")
+	      	db <- dbConnect(sqlite, db)
+	      	ens2biotype <- dbGetQuery(db, 'SELECT distinct(gene_id), gene_name, gene_biotype FROM gene_info')
+		rownames(ens2biotype) <- ens2biotype$gene_id
+		ens <- rownames(mat)
+		biotypes <- ens2biotype[ens,]$gene_biotype
+		genes <- ens2biotype[ens,]$gene_name
+		dbDisconnect(db)
+		biotypedata <- data.frame(gene_id = ens, gene_name = genes, gene_biotype = biotypes)
+		return (biotypedata)
+		}
+
+
 getResultsTable <- function(res, featureData){
 
 	rownames(featureData) <- featureData$gene_id
