@@ -276,10 +276,10 @@ heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation){
 # MAplot
 ################################
 
-getContrast <- function(dds, factor=c("condition"), contrast=c("PSC", "UC")){
+getContrast <- function(dds, factor=c("condition"), contrast=c("PSC", "UC"), test="Wald"){
 
 	    contrast <- append(factor, contrast)
-	    res <- results(dds, contrast=contrast)
+	    res <- results(dds, contrast=contrast, test=test)
 	    return(res)
 	    }
 	    
