@@ -92,7 +92,7 @@ for (i in 1:length(infiles)){
 names(dfs) <- names.list
 df <- bind_rows(dfs)
 x <- sample.map[df$sample,]$reportId
-df$sample <- x
+df$sample <- factor(x, levels=ids)
 
 ################################################
 # define reads.in as the difference between the
@@ -141,7 +141,7 @@ and chimera removal. It is useful to see after this has been done how many seque
 should contribute to the final overall counts.
 
 
-```{r sample-inference, fig.cap='Number of input and output reads during filtering step', fig.height=10, fig.width=10,  echo=FALSE, message=FALSE}
+```{r sample-inference, fig.cap='Number of input and output reads during filtering step', fig.height=8, fig.width=8,  echo=FALSE, message=FALSE}
 
 #########################
 # read relevant infiles
@@ -164,7 +164,7 @@ for (i in 1:length(infiles)){
 names(dfs) <- names.list
 df <- bind_rows(dfs)
 x <- sample.map[df$sample,]$reportId
-df$sample <- x
+df$sample <- factor(x, levels=ids)
 
 # reshape and plot
 df.m <- melt(df)
@@ -186,10 +186,10 @@ were identified in each sample and the taxonomic groups found among them.
 ```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=5, fig.width=12,  echo=FALSE, message=FALSE}
 
 dat <- read.csv("abundance.dir/taxa_abundances.tsv", header=T, stringsAsFactors=F, sep="\t", row.names=1)
-colnames(dat) <- sample.map[gsub("\\.", "-", colnames(dat)),]$reportId
+colnames(dat) <- factor(sample.map[gsub("\\.", "-", colnames(dat)),]$reportId, levels=ids)
 
 nasvs <- data.frame(colSums(dat > 0))
-nasvs$sample <- rownames(nasvs)
+nasvs$sample <- factor(rownames(nasvs), levels=ids)
 nasvs.m <- melt(nasvs)
 
 # number of ASVs
