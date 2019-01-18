@@ -226,7 +226,7 @@ def filterAndTrim(infile, outfile):
         infiles = [infile, infile_read2]
     else:
         paired = ""
-        infiles = infiles
+        infiles = infile
 
     tmpdir = P.get_temp_dir()
     for inf in infiles:
