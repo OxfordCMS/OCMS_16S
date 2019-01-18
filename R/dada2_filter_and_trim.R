@@ -119,9 +119,11 @@ if (is.na(fnR)){
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
 	                compress=TRUE, multithread=TRUE)
    flog.info(paste0(paste0("writing summary to ", opt$`filtered-directory`), "/summary.tsv"))
+   out <- as.data.frame(out)
+   out$sample <- sample.name
    outfile <- paste(opt$`filtered-directory`, sample.name, sep="/")
    outfile <- paste(outfile, "summary.tsv", sep="_")
-   write.table(out, file=outfile, sep="\t")
+   write.table(out, file=outfile, sep="\t", row.names=F, quote=F)
    }
 
 flog.info("DONE")
