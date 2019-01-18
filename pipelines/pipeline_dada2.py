@@ -221,15 +221,14 @@ def filterAndTrim(infile, outfile):
     
     if PARAMS["paired"] == 1:
         paired = "--paired"
+        # unzip one by one
+        infile_read2 = infile.replace(".fastq.1.gz", ".fastq.2.gz")
+        infiles = [infile, infile_read2]
     else:
         paired = ""
+        infiles = infiles
 
     tmpdir = P.get_temp_dir()
-
-    # unzip one by one
-    infile_read2 = infile.replace(".fastq.1.gz", ".fastq.2.gz")
-    infiles = [infile, infile_read2]
-    
     for inf in infiles:
         outtmp = os.path.join(tmpdir, inf.replace(".gz", ""))
         statement = '''zcat %(inf)s > %(outtmp)s'''
