@@ -70,6 +70,11 @@ if (is.na(opt$`filtR`)){
    dadaF.df$sequence <- rownames(dadaF.df)
    dadaF.df <- data.frame(sequence=dadaF.df$sequence, abundance=dadaF.df[,1])
 
+   # get diagnostic clustering data frame
+   df.clustering <- dadaF$clustering
+   clustering.filename <- paste0(opt$`outdir`, sample.name, "_clustering.tsv")
+   write.table(df.clustering, clustering.filename, sep="\t", row.names=F)
+
    # remove chimeras
    flog.info("removing chimeric sequences")
    dadaF.df.nochim <- removeBimeraDenovo(dadaF.df, method="consensus")
@@ -117,9 +122,19 @@ if (is.na(opt$`filtR`)){
    dadaF <- dada(derepF, err=errF, multithread=TRUE)
    dadaR <- dada(derepR, err=errR, multithread=TRUE)
 
+   # get diagnostic clustering data frame
+   dfF.clustering <- dadaF$clustering
+   clustering.forward.filename <- paste0(opt$`outdir`, sample.name, "_forward_clustering.tsv")
+   write.table(dfF.clustering, clustering.forward.filename, sep="\t", row.names=F)
+
+   dfR.clustering <- dadaR$clustering
+   clustering.reverse.filename <- paste0(opt$`outdir`, sample.name, "_reverse_clustering.tsv")
+   write.table(dfR.clustering, clustering.reverse.filename, sep="\t", row.names=F)
+
    # merge pairs - returns a dataframe
    flog.info("merging paired reads")
    mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE)
+
 
    mergers <- data.frame(sequence=mergers$sequence,
    	                 abundance=mergers$abundance,
@@ -130,6 +145,10 @@ if (is.na(opt$`filtR`)){
 			 nindel=mergers$nindel,
 			 prefer=mergers$prefer,
 			 accept=mergers$accept)
+
+   flog.info("reoving sequences where accept==FALSE")
+   # just keep accepted merged sequences
+   mergers <- mergers[mergers$accept==TRUE,]
 
    # remove chimeras
    flog.info("removing chimeric sequences")
