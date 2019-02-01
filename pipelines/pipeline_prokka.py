@@ -8,8 +8,8 @@
 ##############################################
 
 from ruffus import *
-from CGATPipelines import Pipeline as P
-import CGAT.IOTools as IOTools
+from cgatpipelines import pipeline as P
+import cgatcore.iotools as IOTools
 import os
 import sys
 import collections
