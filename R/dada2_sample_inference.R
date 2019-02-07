@@ -245,7 +245,6 @@ if (is.na(opt$`filtR`)){
 			       R.birth_ham=mergers$R.birth_ham,
 			       R.birth_qave=mergers$R.birth_qave)
 
-   print(df.clustering)
 
    clustering.filename <- paste0(opt$`outdir`, "/", sample.name, "_clustering.tsv")
    write.table(df.clustering, clustering.filename, sep="\t", row.names=F)
