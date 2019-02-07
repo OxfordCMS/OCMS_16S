@@ -27,7 +27,7 @@ sample_inference:
     # number of reads to use (per sample) to estimate error
     # model
     nreads: 50000
-    min_hamming: 1
+    options: ''
 
 taxonomy:
 
