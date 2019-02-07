@@ -248,7 +248,7 @@ if (is.na(opt$`filtR`)){
 
 
    clustering.filename <- paste0(opt$`outdir`, "/", sample.name, "_clustering.tsv")
-   write.table(df.clustering, clustering.filename, sep="\t", row.names=F)
+   write.table(df.clustering, clustering.filename, sep="\t", row.names=F, quote=F)
 
    mergers <- data.frame(sequence=mergers$sequence,
    	                 abundance=mergers$abundance,
