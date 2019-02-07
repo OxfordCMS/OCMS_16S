@@ -17,6 +17,8 @@ option_list <- list(
                            help="filtered reverse fastq file [default %default]"),
 	       make_option(c("-n", "--nreads"), default=1000000,
                            help="number of reads to learn error model [default %default]"),
+	       make_option(c("--min-hamming"), default=1,
+                           help="minimum hamming distance to define new cluster [default %default]"),
 	       make_option(c("-o", "--outdir"), default=".",
                            help="output directory - name will be based on file name [default %default]")
 			   )
@@ -63,7 +65,7 @@ if (is.na(opt$`filtR`)){
 
    # sample inference
    flog.info("sample inference")	
-   dadaF <- dada(derepF, err=errF, multithread=TRUE)
+   dadaF <- dada(derepF, err=errF, multithread=TRUE, MIN_HAMMING=opt$`min-hamming`)
 
    # return a dataframe - I find this more intuitive
    dadaF.df <- as.data.frame(dadaF$denoised)
@@ -72,8 +74,8 @@ if (is.na(opt$`filtR`)){
 
    # get diagnostic clustering data frame
    df.clustering <- dadaF$clustering
-   clustering.filename <- paste0(opt$`outdir`, sample.name, "_clustering.tsv")
-   write.table(df.clustering, clustering.filename, sep="\t", row.names=F)
+   clustering.filename <- paste0(opt$`outdir`, "/", sample.name, "_clustering.tsv")
+   write.table(df.clustering, clustering.filename, sep="\t", row.names=FALSE)
 
    # remove chimeras
    flog.info("removing chimeric sequences")
@@ -119,22 +121,17 @@ if (is.na(opt$`filtR`)){
 
    # sample inference
    flog.info("sample inference")
-   dadaF <- dada(derepF, err=errF, multithread=TRUE)
-   dadaR <- dada(derepR, err=errR, multithread=TRUE)
-
-   # get diagnostic clustering data frame
-   dfF.clustering <- dadaF$clustering
-   clustering.forward.filename <- paste0(opt$`outdir`, sample.name, "_forward_clustering.tsv")
-   write.table(dfF.clustering, clustering.forward.filename, sep="\t", row.names=F)
-
-   dfR.clustering <- dadaR$clustering
-   clustering.reverse.filename <- paste0(opt$`outdir`, sample.name, "_reverse_clustering.tsv")
-   write.table(dfR.clustering, clustering.reverse.filename, sep="\t", row.names=F)
+   dadaF <- dada(derepF, err=errF, multithread=TRUE, MIN_HAMMING=opt$`min-hamming`)
+   dadaR <- dada(derepR, err=errR, multithread=TRUE, MIN_HAMMING=opt$`min-hamming`)
 
    # merge pairs - returns a dataframe
    flog.info("merging paired reads")
-   mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE)
+   mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE, propogateCol=c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave"))
 
+   # get diagnostic clustering data frame
+   df.clustering <- mergers[,c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave")]
+   clustering.filename <- paste0(opt$`outdir`, "/", sample.name, "_clustering.tsv")
+   write.table(df.clustering, clustering.filename, sep="\t", row.names=F)
 
    mergers <- data.frame(sequence=mergers$sequence,
    	                 abundance=mergers$abundance,
