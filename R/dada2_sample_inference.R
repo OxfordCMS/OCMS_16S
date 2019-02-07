@@ -17,9 +17,61 @@ option_list <- list(
                            help="filtered reverse fastq file [default %default]"),
 	       make_option(c("-n", "--nreads"), default=1000000,
                            help="number of reads to learn error model [default %default]"),
-	       make_option(c("--min-hamming"), default=1,
+	       make_option(c("--omega-a"), default=1e-40,
+                           help="p-value for new clusters [default %default]"),
+	       make_option(c("--use-quals"), default=TRUE,
+                           help="If TRUE, the dada(...) error model takes into account
+                           the consensus quality score of the dereplicated unique sequences.
+                           If FALSE, quality scores are ignored. Default is TRUE.
+                           [default %default]"),
+               make_option(c("--use-kmers"), default=TRUE,
+                           help="If TRUE, a 5-mer distance screen is performed prior to
+                           performing each pairwise alignment, and if the 5mer-distance is
+                           greater than KDIST_CUTOFF, no alignment is performed. Default is
+                           TRUE. [default %default]"),
+	       make_option(c("--kdist-cutoff"), default=0.42,
+                           help="The default value of 0.42 was chosen to screen pairs
+                           of sequences that differ by >10%, and was calibrated on Illumina
+                           sequenced 16S amplicon data. The assumption is that sequences that
+                           differ by such a large amount cannot be linked by amplicon errors
+                           (i.e. if you sequence one, you won't get a read of other) and so
+                           careful (and costly) alignment is unnecessary. [default %default]"),
+	       make_option(c("--band-size"), default=16,
+                           help="When set, banded Needleman-Wunsch alignments are
+                           performed. Banding restricts the net cumulative number of
+                           insertion of one sequence relative to the other. The default value
+                           of BAND_SIZE is 16. If DADA is applied to marker genes with high
+                           rates of indels, such as the ITS region in fungi, the BAND_SIZE
+                           parameter should be increased. Setting BAND_SIZE to a negative
+                           number turns off banding (i.e. full Needleman-Wunsch). [default %default]"),
+	       make_option(c("--gap-penalty"), default=-8,
+                           help="The cost of gaps in the Needleman-Wunsch alignment.
+                           Default is -8.[default %default]"),
+	       make_option(c("--homopolymer-gap-penalty"), default=NULL,
+                           help="The cost of gaps in homopolymer regions
+                          (>=3 repeated bases). Default is NULL, which causes homopolymer
+                          gaps to be treated as normal gaps. [default %default]"),
+	       make_option(c("--min-fold"), default=1,
+                           help="The minimum fold-overabundance for sequences to form new
+                           clusters. Default value is 1, which means this criteria is
+                           ignored.[default %default]"),
+               make_option(c("--min-hamming"), default=1,
                            help="minimum hamming distance to define new cluster [default %default]"),
-	       make_option(c("-o", "--outdir"), default=".",
+               make_option(c("--min-abundance"), default=1,
+                           help="The minimum abundance for unique sequences form new
+                           clusters. Default value is 1, which means this criteria is
+                           ignored.[default %default]"),
+               make_option(c("--max-clust"), default=0,
+                           help="The maximum number of clusters. Once this many clusters
+                           have been created, the algorithm terminates regardless of whether
+                           the statistical model suggests more real sequence variants exist.
+                           If set to 0 this argument is ignored. Default value is 0.[default %default]"),
+               make_option(c("--max-consist"), default=10,
+                           help="The maximum number of steps when selfConsist=TRUE. If
+                           convergence is not reached in MAX_CONSIST steps, the algorithm
+                           will terminate with a warning message. Default value is 10.
+                           [default %default]"),
+               make_option(c("-o", "--outdir"), default=".",
                            help="output directory - name will be based on file name [default %default]")
 			   )
 
@@ -65,7 +117,22 @@ if (is.na(opt$`filtR`)){
 
    # sample inference
    flog.info("sample inference")	
-   dadaF <- dada(derepF, err=errF, multithread=TRUE, MIN_HAMMING=opt$`min-hamming`)
+   dadaF <- dada(derepF,
+                 err=errF,
+		 multithread=TRUE,
+		 OMEGA_A=opt$`omega-a`,
+		 USE_QUALS=opt$`use-quals,
+		 USE_KMERS=opt$`use-kmers`,
+		 KDIST_CUTOFF=opt$`kdist-cutoff`,
+		 BAND_SIZE=opt$`band-size`,
+		 GAP_PENALTY=opt$`gap-penalty`,
+		 HOMOPOLYMER_GAP_PENALTY=opt`homopolymer-ga-penalty`,
+		 MIN_FOLD=opt$`min-fold`,
+                 MIN_HAMMING=opt$`min-hamming`,
+                 MIN_ABUNDANCE=opt$`min-abundance`,
+		 MAX_CLUST=opt$`max-clust`,
+		 MAX_CONSIST=opt$`max-consist`
+                 )
 
    # return a dataframe - I find this more intuitive
    dadaF.df <- as.data.frame(dadaF$denoised)
@@ -121,8 +188,37 @@ if (is.na(opt$`filtR`)){
 
    # sample inference
    flog.info("sample inference")
-   dadaF <- dada(derepF, err=errF, multithread=TRUE, MIN_HAMMING=opt$`min-hamming`)
-   dadaR <- dada(derepR, err=errR, multithread=TRUE, MIN_HAMMING=opt$`min-hamming`)
+   dadaF <- dada(derepF,
+                 err=errF,
+		 multithread=TRUE,
+		 OMEGA_A=opt$`omega-a`,
+		 USE_QUALS=opt$`use-quals,
+		 USE_KMERS=opt$`use-kmers`,
+		 KDIST_CUTOFF=opt$`kdist-cutoff`,
+		 BAND_SIZE=opt$`band-size`,
+		 GAP_PENALTY=opt$`gap-penalty`,
+		 HOMOPOLYMER_GAP_PENALTY=opt`homopolymer-ga-penalty`,
+		 MIN_FOLD=opt$`min-fold`,
+                 MIN_HAMMING=opt$`min-hamming`,
+                 MIN_ABUNDANCE=opt$`min-abundance`,
+		 MAX_CLUST=opt$`max-clust`,
+		 MAX_CONSIST=opt$`max-consist`)
+
+   dadaR <- dada(derepR,
+                 err=errR,
+		 multithread=TRUE,
+		 OMEGA_A=opt$`omega-a`,
+		 USE_QUALS=opt$`use-quals,
+		 USE_KMERS=opt$`use-kmers`,
+		 KDIST_CUTOFF=opt$`kdist-cutoff`,
+		 BAND_SIZE=opt$`band-size`,
+		 GAP_PENALTY=opt$`gap-penalty`,
+		 HOMOPOLYMER_GAP_PENALTY=opt`homopolymer-ga-penalty`,
+		 MIN_FOLD=opt$`min-fold`,
+                 MIN_HAMMING=opt$`min-hamming`,
+                 MIN_ABUNDANCE=opt$`min-abundance`,
+		 MAX_CLUST=opt$`max-clust`,
+		 MAX_CONSIST=opt$`max-consist`)
 
    # merge pairs - returns a dataframe
    flog.info("merging paired reads")
