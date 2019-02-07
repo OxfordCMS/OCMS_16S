@@ -226,7 +226,8 @@ if (is.na(opt$`filtR`)){
 
 
    # get diagnostic clustering data frame
-   df.clustering <- data.frame(F.n0=mergers$F.n0,
+   df.clustering <- data.frame(sequence=mergers$sequence,
+                               F.n0=mergers$F.n0,
                                F.n1=mergers$F.n1,
 			       F.nunq=mergers$F.nunq,
 			       F.pval=mergers$F.pval,
