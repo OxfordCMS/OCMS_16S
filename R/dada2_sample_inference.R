@@ -225,7 +225,16 @@ if (is.na(opt$`filtR`)){
    mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE, propagateCol=c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave"))
 
    # get diagnostic clustering data frame
-   df.clustering <- mergers[,c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave")]
+   df.clustering <- data.frame(n0=mergers$n0,
+                               n1=mergers$n1,
+			       nunq=mergers$nunq,
+			       pval=mergers$pval,
+			       birth_type=mergers$birth_type,
+			       birth_pval=mergers$birth_pval,
+			       birth_fold=mergers$birth_fold,
+			       birth_ham=mergers$birth_ham,
+			       birth_qave=mergers$birth_qave)
+			       
    clustering.filename <- paste0(opt$`outdir`, "/", sample.name, "_clustering.tsv")
    write.table(df.clustering, clustering.filename, sep="\t", row.names=F)
 
