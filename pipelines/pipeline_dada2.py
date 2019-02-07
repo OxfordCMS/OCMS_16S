@@ -263,7 +263,7 @@ def runSampleInference(infile, outfile):
     4) removing chimeras
     '''
     nreads = PARAMS["sample_inference_nreads"]
-    min_hamming = PARAMS["sample_inference_min_hamming"]
+    options = PARAMS["sample_inference_options"]
     outdir = os.path.dirname(outfile)
 
     if PARAMS["paired"] == 1:
@@ -275,13 +275,13 @@ def runSampleInference(infile, outfile):
                        --filtF=%(infile)s
                        --filtR=%(infile_read2)s
                        --nreads=%(nreads)s
-                       --min-hamming=%(min_hamming)s
+                       %(options)s
                        --outdir=%(outdir)s'''
     else:
         statement = '''Rscript %(scriptsdir)s/dada2_sample_inference.R
                        --filtF=%(infile)s
                        --nreads=%(nreads)s
-                       --min-hamming=%(min_hamming)s
+                       %(options)s
                        --outdir=%(outdir)s'''
 
     P.run(statement)
