@@ -224,17 +224,29 @@ if (is.na(opt$`filtR`)){
    flog.info("merging paired reads")
    mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE, propagateCol=c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave"))
 
+
    # get diagnostic clustering data frame
-   df.clustering <- data.frame(n0=mergers$n0,
-                               n1=mergers$n1,
-			       nunq=mergers$nunq,
-			       pval=mergers$pval,
-			       birth_type=mergers$birth_type,
-			       birth_pval=mergers$birth_pval,
-			       birth_fold=mergers$birth_fold,
-			       birth_ham=mergers$birth_ham,
-			       birth_qave=mergers$birth_qave)
-			       
+   df.clustering <- data.frame(F.n0=mergers$F.n0,
+                               F.n1=mergers$F.n1,
+			       F.nunq=mergers$F.nunq,
+			       F.pval=mergers$F.pval,
+			       F.birth_type=mergers$F.birth_type,
+			       F.birth_pval=mergers$F.birth_pval,
+			       F.birth_fold=mergers$F.birth_fold,
+			       F.birth_ham=mergers$F.birth_ham,
+			       F.birth_qave=mergers$F.birth_qave,
+                               R.n0=mergers$R.n0,
+                               R.n1=mergers$R.n1,
+			       R.nunq=mergers$R.nunq,
+			       R.pval=mergers$R.pval,
+			       R.birth_type=mergers$R.birth_type,
+			       R.birth_pval=mergers$R.birth_pval,
+			       R.birth_fold=mergers$R.birth_fold,
+			       R.birth_ham=mergers$R.birth_ham,
+			       R.birth_qave=mergers$R.birth_qave)
+
+   print(df.clustering)
+
    clustering.filename <- paste0(opt$`outdir`, "/", sample.name, "_clustering.tsv")
    write.table(df.clustering, clustering.filename, sep="\t", row.names=F)
 
