@@ -222,7 +222,7 @@ if (is.na(opt$`filtR`)){
 
    # merge pairs - returns a dataframe
    flog.info("merging paired reads")
-   mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE, propogateCol=c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave"))
+   mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE, propagateCol=c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave"))
 
    # get diagnostic clustering data frame
    df.clustering <- mergers[,c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave")]
