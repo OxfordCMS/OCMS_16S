@@ -71,6 +71,10 @@ option_list <- list(
                            convergence is not reached in MAX_CONSIST steps, the algorithm
                            will terminate with a warning message. Default value is 10.
                            [default %default]"),
+               make_option(c("--filter"), default=0,
+                           help="filter sequences out if (n0+n1)/abundance < --filter. This hopes to remove
+                           spurious sequences that are a partition that contains sequences with few true
+                           matches [default %default]"),
                make_option(c("-o", "--outdir"), default=".",
                            help="output directory - name will be based on file name [default %default]")
 			   )
@@ -143,6 +147,10 @@ if (is.na(opt$`filtR`)){
    df.clustering <- dadaF$clustering
    clustering.filename <- paste0(opt$`outdir`, "/", sample.name, "_clustering.tsv")
    write.table(df.clustering, clustering.filename, sep="\t", row.names=FALSE)
+
+   # filtering options
+   sequences.to.keep <- df.clustering$sequence[(df.clustering$n0 + df.clustering$n1)/df.clustering$abundance >= opt$`filter`]
+   dadaF.df <- dadaF.df[dadaF.df$sequence %in% sequences.to.keep,]
 
    # remove chimeras
    flog.info("removing chimeric sequences")

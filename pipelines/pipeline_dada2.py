@@ -429,6 +429,11 @@ def build_report():
     # render the report
     statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i report.Rmd; cd ../'''
     P.run(statement)
+
+    # render the diagnostic report
+    statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i pipeline_dada2_diagnostics.Rmd; cd ../'''
+    P.run(statement)
+
     
 #########################################
 #########################################
