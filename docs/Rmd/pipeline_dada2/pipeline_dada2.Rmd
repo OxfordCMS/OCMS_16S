@@ -185,7 +185,10 @@ were identified in each sample and the taxonomic groups found among them.
 
 ```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=5, fig.width=12,  echo=FALSE, message=FALSE}
 
-dat <- read.csv("abundance.dir/taxa_abundances.tsv", header=T, stringsAsFactors=F, sep="\t", row.names=1)
+library(data.table)
+dat <- data.frame(fread("abundance.dir/taxa_abundances.tsv", header=TRUE, stringsAsFactors=F, sep="\t"))
+rownames(dat) <- dat$sequence
+dat <- dat[,2:ncol(dat)]
 colnames(dat) <- factor(sample.map[gsub("\\.", "-", colnames(dat)),]$reportId, levels=ids)
 
 nasvs <- data.frame(colSums(dat > 0))
