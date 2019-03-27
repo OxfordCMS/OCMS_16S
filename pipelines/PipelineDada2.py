@@ -7,6 +7,7 @@
 ##################################################
 
 import re
+import itertools
 
 def seq2id(seqtable, outfile_map, outfile_table):
     '''
@@ -115,3 +116,31 @@ def makeDefinitiveAbundanceFile(id2seq, seq2taxonomy, id2abundance, outfile):
         outfile.write("\t".join([newid] + data[1:]) + "\n")
     outfile.close()
     
+
+##################################################
+##################################################
+##################################################
+
+def buildTree(infile, outfile):
+    '''
+    builds a text format tree file for putting into
+    graphlan. Takes merged_taxonomy.tsv as input
+    just go down to genus - Removes 
+    '''
+    inf = open(infile)
+    inf.readline()
+
+    outf = open(outfile, "w")
+    for line in inf.readlines():
+        data = line[:-1].split("\t")
+        asv_taxon = data[0]
+        asv_taxon = asv_taxon.replace(":", ";")
+        asv_taxon = asv_taxon.split(";")
+        asv_taxon = asv_taxon[1:6] + [asv_taxon[0]]
+        asv_taxon = ".".join(asv_taxon)
+        outf.write(f'{asv_taxon}\n')
+    outf.close()
+
+
+
+        

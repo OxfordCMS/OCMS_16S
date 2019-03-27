@@ -373,6 +373,18 @@ def buildDefinitiveTable(infiles, outfile):
 #########################################
 #########################################
 
+@follows(mkdir("tree.dir"))
+@transform(buildDefinitiveTable, regex("(\S+)/taxa_abundances.tsv"), r"tree.dir/tree.tsv")
+def buildTree(infile, outfile):
+    '''
+    build a taxonomic tree of all ASVs that were detected across samples
+    '''
+    PipelineDada2.buildTree(infile, outfile)
+
+#########################################
+#########################################
+#########################################
+
 @follows(mkdir("taxonomy_abundances.dir"))
 @split(buildDefinitiveTable, "taxonomy_abundances.dir/*_abundance.tsv")
 def splitTableByTaxonomicLevels(infile, outfiles):
@@ -390,7 +402,7 @@ def splitTableByTaxonomicLevels(infile, outfiles):
 #########################################
 #########################################
 
-@follows(splitTableByTaxonomicLevels)
+@follows(buildTree, splitTableByTaxonomicLevels)
 def full():
     pass
 
