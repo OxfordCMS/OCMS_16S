@@ -66,7 +66,7 @@ buildPerLevelTable <- function(taxa_abundances, level="phylum"){
 		   return(d)
 		   }
 
-dat <- read.csv(opt$`infile`, header=T, stringsAsFactors=F, sep="\t", row.names=1)
+dat <- read.csv(opt$`infile`, header=T, stringsAsFactors=F, sep="\t", row.names=1, quote="")
 
 flog.info("writing per level tables")
 p <- buildPerLevelTable(dat, level="phylum")
