@@ -183,7 +183,7 @@ The next stage is to assign each of the amplicon sequence variants (ASV) to a ta
 were identified in each sample and the taxonomic groups found among them.
 
 
-```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=5, fig.width=12,  echo=FALSE, message=FALSE}
+```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=10, fig.width=10,  echo=FALSE, message=FALSE}
 
 library(data.table)
 dat <- data.frame(fread("abundance.dir/taxa_abundances.tsv", header=TRUE, stringsAsFactors=F, sep="\t"))
@@ -220,6 +220,6 @@ plotBar <- function(x){
 
 p6 <- plotBar(dp)
 
-grid.arrange(p5,p6, ncol=2, nrow=1)
+grid.arrange(p5,p6, ncol=1, nrow=2)
 
 ```
