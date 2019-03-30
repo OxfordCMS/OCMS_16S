@@ -17,7 +17,7 @@ trim:
     maxee: 2,2
     truncq: 2
     trunclen: 250,160
-    trimLeft: 0,0
+    trimleft: 0,0
 
 sample_inference:
 
