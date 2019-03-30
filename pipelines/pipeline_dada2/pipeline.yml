@@ -12,11 +12,12 @@ trim:
 
     # parameters used for trimming reads. If the data are
     # paired-end then you need to specify 2 values for
-    # maxee and truncLen. These parameters must be specified
+    # maxee, truncLen and trimLeft. These parameters must be specified
     maxn: 0
     maxee: 2,2
     truncq: 2
     trunclen: 250,160
+    trimLeft: 0,0
 
 sample_inference:
 

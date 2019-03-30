@@ -214,9 +214,10 @@ def filterAndTrim(infile, outfile):
     maxee=PARAMS["trim_maxee"]
     truncQ=PARAMS["trim_truncq"]
     truncLen=PARAMS["trim_trunclen"]
+    trimLeft=PARAMS["trim_trimleft"]
 
     # make sure parameters are present
-    assert maxn != "" and maxee != "" and truncQ != "" and truncLen != "", \
+    assert maxn != "" and maxee != "" and truncQ != "" and truncLen != "" and trimleft !="", \
     "must specify all parameters to filterAndTrim"
     
     if PARAMS["paired"] == 1:
@@ -243,6 +244,7 @@ def filterAndTrim(infile, outfile):
                            --maxEE=%(maxee)s
                            --truncQ=%(truncQ)s
                            --truncLen=%(truncLen)s
+                           --trimLeft=%(trimLeft)s
                            --filtered-directory=filtered.dir'''
     P.run(statement)
     shutil.rmtree(tmpdir)

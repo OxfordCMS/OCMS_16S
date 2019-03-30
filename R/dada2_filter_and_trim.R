@@ -24,6 +24,9 @@ option_list <- list(
                            help="truncate reads at the first instance of a quality score less than or equal to truncQ [default %default]"),
                make_option(c("--truncLen"), default="250,250",
                            help="truncate  reads  after truncLen bases [default %default]"))
+               make_option(c("--trimLeft"), default="0,0",
+                           help="trim left sequence (primers) [default %default]"))
+
 
 # suppress warning messages
 options(warn=-1)
@@ -77,6 +80,7 @@ splitArg <- function(arg){
 # list options
 truncLen <- as.numeric(splitArg(opt$`truncLen`))
 maxEE <- as.numeric(splitArg(opt$`maxEE`))
+trimLeft <- as.numeric(splitArg(opt$`trimLeft`))
 
 # select input fastq files
 
@@ -101,6 +105,7 @@ if (!(is.na(fnR))){
 
    out <- filterAndTrim(fnF, filtF, fnR, filtR,
                         truncLen=truncLen,
+			trimLeft=trimLeft,
                         maxN=opt$`maxN`,
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
 	                compress=TRUE, multithread=TRUE)
@@ -115,6 +120,7 @@ if (!(is.na(fnR))){
 if (is.na(fnR)){
    out <- filterAndTrim(fnF, filtF,
                         truncLen=truncLen,
+			trimLeft=trimLeft,
                         maxN=opt$`maxN`,
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
 	                compress=TRUE, multithread=TRUE)
