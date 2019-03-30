@@ -217,7 +217,7 @@ def filterAndTrim(infile, outfile):
     trimLeft=PARAMS["trim_trimleft"]
 
     # make sure parameters are present
-    assert maxn != "" and maxee != "" and truncQ != "" and truncLen != "" and trimleft !="", \
+    assert maxn != "" and maxee != "" and truncQ != "" and truncLen != "" and trimLeft !="", \
     "must specify all parameters to filterAndTrim"
     
     if PARAMS["paired"] == 1:
