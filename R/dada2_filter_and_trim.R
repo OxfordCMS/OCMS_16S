@@ -23,7 +23,7 @@ option_list <- list(
                make_option(c("--truncQ"), default=2,
                            help="truncate reads at the first instance of a quality score less than or equal to truncQ [default %default]"),
                make_option(c("--truncLen"), default="250,250",
-                           help="truncate  reads  after truncLen bases [default %default]")
+                           help="truncate  reads  after truncLen bases [default %default]"),
                make_option(c("--trimLeft"), default="0,0",
                            help="trim left sequence (primers) [default %default]"))
 
