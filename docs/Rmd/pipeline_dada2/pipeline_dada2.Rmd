@@ -203,7 +203,7 @@ p4 <- p3 + theme(axis.text.x=element_text(angle=90))
 p5 <- p4 + ylab("number of ASVs")
 
 # taxonomic distributions
-# combine at different levels down to genus
+# phylum level only for visualisation purposes
 
 p <- gsub(";c__.*", "", rownames(dat))
 p <- gsub("ASV[0-9]*:", "", p)
@@ -219,7 +219,40 @@ plotBar <- function(x){
 	}
 
 p6 <- plotBar(dp)
-
 grid.arrange(p5,p6, ncol=1, nrow=2)
+```
+
+## Number of ASVs assigned at different taxonomic levels
+
+It is useful to assess the proportion of ASVs that could be successfully assigned to taxa. We would expect (in most cases) that the majority of ASVs woild be assigned at high taxonomic ranks (e.g. phylum) and fewer at lower taxonomic ranks (e.g. species).
+
+```{r nasvs.assigned, fig.height=5, fig.width=7, echo=FALSE, message=FALSE}
+
+# Plot number of asvs assigned at each level
+
+taxonomy.abundances <- list.files(path="taxonomy_abundances.dir", pattern="*.tsv")
+nasvs.assigned <- list()
+
+for (i in 1:length(taxonomy.abundances)){
+    dir <- "taxonomy_abundances.dir"
+    inf <- taxonomy.abundances[i]
+    tfile <- paste0(dir, "/", inf)
+    abundances <- read.csv(tfile, header=T, stringsAsFactors=F, sep="\t", quote="", row.names=1)
+    # get the first letter of file which is level
+    level <- substr(inf, 1, 1)
+    level.na <- paste0(level, "__", "NA")
+    nhit <- nrow(abundances[grep(level.na, rownames(abundances), invert=TRUE),])
+    n <- nrow(abundances)
+    level <- unlist(strsplit(inf, "_"))[1]
+    nassigned <- data.frame(percent.assigned=(nhit/n)*100, level=level)
+    nasvs.assigned[[i]] <- nassigned
+}
+nasvs.assigned <- bind_rows(nasvs.assigned)
+nasvs.assigned$level <- factor(nasvs.assigned$level, levels=c("phylum", "class", "order", "family", "genus", "species"))
+p7 <- ggplot(nasvs.assigned, aes(x=level, y=percent.assigned, fill=level))
+p8 <- p7 + geom_bar(stat="identity")
+p9 <- p8 + theme_bw() 
+p10 <- p9 + ylab("% assigned") + xlab("Taxonomic levels")
+p10 + scale_fill_manual(values=c("red3", "blue3", "green3", "orange3", "purple3", "grey", "black"))
 
 ```
