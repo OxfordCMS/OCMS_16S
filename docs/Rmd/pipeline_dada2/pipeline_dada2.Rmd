@@ -63,13 +63,14 @@ library(gridExtra)
 library(dplyr)
 library(reshape)
 library(gplots)
+library(data.table)
 ```
 
 ### Number of reads input/output during filtering and trimming
 
 Below is a summary of the number of input reads and the number of output reads for each sample.
 
-```{r filtering, fig.cap='Number of input and output reads during filtering step', fig.height=5, fig.width=10,  echo=FALSE, message=FALSE}
+```{r filtering, fig.cap='Number of input and output reads during filtering step', fig.height=4, fig.width=10,  echo=FALSE, message=FALSE}
 
 #########################
 # read relevant infiles
@@ -177,15 +178,13 @@ p4
 
 ```
 
-## Taxonomic assignment
+## Number of ASVs called per sample and their prevalence
 
-The next stage is to assign each of the amplicon sequence variants (ASV) to a taxonomic group. Below is a description of the number of ASVs that
-were identified in each sample and the taxonomic groups found among them.
+A useful metric is the number of ASVs that were called per sample even though we may not no beforehand the expected diversity in the samples we are analysing. In addition to simply counting the number of ASVs per sample we also plot the prevalence of these ASVs i.e. the proportion of samples that each ASV is observed in. By plotting the prevalence against the average relative abundance we get an idea of the presence of suprious ASVs i.e. low prevalence and low abundance.
 
+```{r nasvs, fig.height=4, fig.width=10,  echo=FALSE, message=FALSE}
 
-```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=10, fig.width=10,  echo=FALSE, message=FALSE}
-
-library(data.table)
+# read ASV counts and reformat
 dat <- data.frame(fread("abundance.dir/taxa_abundances.tsv", header=TRUE, stringsAsFactors=F, sep="\t"))
 rownames(dat) <- dat$sequence
 dat <- dat[,2:ncol(dat)]
@@ -201,6 +200,77 @@ p2 <- p1 + geom_bar(stat="identity")
 p3 <- p2 + theme_bw()
 p4 <- p3 + theme(axis.text.x=element_text(angle=90))
 p5 <- p4 + ylab("number of ASVs")
+p5
+```
+
+```{r prevalence, fig.height=4, fig.width=10, echo=FALSE, message=FALSE}
+
+# Functions lifted from AmpSeqKit - this will be a package in the future
+
+###############
+###############
+###############
+
+# prevalence
+pprev <- function(counts){
+
+    nsamples <- ncol(counts)
+    prev <- (rowSums(counts > 0)/nsamples)*100
+    prev.df <- data.frame(Taxon=rownames(counts), Prevalence=prev)
+    return(prev.df)
+    }
+
+###############
+###############
+###############
+
+# plotting
+plotPrev <- function(prev.df, as.is=TRUE){
+
+    if (as.is==TRUE){
+        p1 <- ggplot(prev.df, aes(x=Taxon, y=Prevalence))
+        p2 <- p1 + geom_bar(stat="identity")
+        p3 <- p2 + theme_bw()
+        p4 <- p3 + theme(axis.text.x=element_text(angle=90))
+    }else{
+        p1 <- ggplot(prev.df, aes(x=Prevalence))
+        p2 <- p1 + geom_histogram()
+        p3 <- p2 + theme_bw()
+        p4 <- p3
+    }
+    return(p4)
+}
+
+# calculate and plot histogram of prevalence
+prev <- pprev(dat)
+p6 <- plotPrev(prev, as.is=FALSE)
+
+# relative abundance
+relab <- function(counts){
+
+    relab <- (sweep(counts, 2, colSums(counts), "/"))*100
+    return(relab)
+    }
+
+# plot abundance vs. prevalence
+ave.abundance <- rowMeans(relab(dat))
+prev$abundance <- ave.abundance
+
+p7 <- ggplot(prev, aes(x=abundance, y=Prevalence))
+p8 <- p7 + geom_point()
+p9 <- p8 + theme_bw()
+p10 <- p9 + xlab("Mean relative abundance") + ylab("Prevalence (%)")
+
+grid.arrange(p6, p10, nrow=1, ncol=2)
+
+```
+
+## Taxonomic assignment
+
+The next stage is to assign each of the amplicon sequence variants (ASV) to a taxonomic group. Below are plots of the taxonomic assignments for each sample (relative abundance at the phylum level) as well as the proportion of all ASVs that could be assigned at each taxonomic rank (phylum-species). We would expect (in most cases) that the majority of ASVs woild be assigned at high taxonomic ranks (e.g. phylum) and fewer at lower taxonomic ranks (e.g. species).
+
+
+```{r taxonomy, fig.height=4, fig.width=10,  echo=FALSE, message=FALSE}
 
 # taxonomic distributions
 # phylum level only for visualisation purposes
@@ -209,6 +279,7 @@ p <- gsub(";c__.*", "", rownames(dat))
 p <- gsub("ASV[0-9]*:", "", p)
 dp <- melt(aggregate(dat, list(p), sum))
 
+# again lifted from AmpSeqKit.
 plotBar <- function(x){
 	p1 <- ggplot(x, aes(x=variable, y=value, fill=Group.1))
 	p2 <- p1 + geom_bar(position="fill", stat="identity")
@@ -218,15 +289,12 @@ plotBar <- function(x){
 	return(p5)
 	}
 
-p6 <- plotBar(dp)
-grid.arrange(p5,p6, ncol=1, nrow=2)
+# plot phylum level distributions
+p11 <- plotBar(dp)
+p11
 ```
 
-## Number of ASVs assigned at different taxonomic levels
-
-It is useful to assess the proportion of ASVs that could be successfully assigned to taxa. We would expect (in most cases) that the majority of ASVs woild be assigned at high taxonomic ranks (e.g. phylum) and fewer at lower taxonomic ranks (e.g. species).
-
-```{r nasvs.assigned, fig.height=5, fig.width=7, echo=FALSE, message=FALSE}
+```{r nreads.in.taxa, fig.height=4, fig.width=5, echo=FALSE, message=FALSE}
 
 # Plot number of asvs assigned at each level
 
@@ -249,10 +317,12 @@ for (i in 1:length(taxonomy.abundances)){
 }
 nasvs.assigned <- bind_rows(nasvs.assigned)
 nasvs.assigned$level <- factor(nasvs.assigned$level, levels=c("phylum", "class", "order", "family", "genus", "species"))
-p7 <- ggplot(nasvs.assigned, aes(x=level, y=percent.assigned, fill=level))
-p8 <- p7 + geom_bar(stat="identity")
-p9 <- p8 + theme_bw() 
-p10 <- p9 + ylab("% assigned") + xlab("Taxonomic levels")
-p10 + scale_fill_manual(values=c("red3", "blue3", "green3", "orange3", "purple3", "grey", "black"))
-
+p12 <- ggplot(nasvs.assigned, aes(x=level, y=percent.assigned, fill=level))
+p13 <- p12 + geom_bar(stat="identity")
+p14 <- p13 + theme_bw() 
+p15 <- p14 + ylab("% assigned") + xlab("Taxonomic levels")
+p16 <- p15 + scale_fill_manual(values=c("red3", "blue3", "green3", "orange3", "purple3", "grey", "black"))
+p16
 ```
+
+
