@@ -30,7 +30,7 @@ knitr::opts_knit$set(root.dir = "../")
 
 ## Sample mapping
 
-When there are lots of samples with complicated samplenames the rendering of this document is
+When there are lots of samples with complicated sample names the rendering of this document is
 suboptimal. To mitigate unwanted visual effects (somewhat) we map each sample to a unique number
 that is plotted on each graph - the map is below for linking what you see in the plots to the
 sample names.
@@ -228,6 +228,7 @@ pprev <- function(counts){
 plotPrev <- function(prev.df, as.is=TRUE){
 
     if (as.is==TRUE){
+        prev.df <- prev.df[order(prev.df$Prevalence, decreasing=TRUE),]
         p1 <- ggplot(prev.df, aes(x=Taxon, y=Prevalence))
         p2 <- p1 + geom_bar(stat="identity")
         p3 <- p2 + theme_bw()
