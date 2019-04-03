@@ -18,12 +18,12 @@ Files that are provided are:
 Fastqc report (html)
 dada2 report (html)
 taxa_abundances.tsv (ASV level count data)
-species_abundances.tsv (count data at species level)
-genus_abundances.tsv (count data at genus level)
-family_abundances.tsv (count data at family level)
-order_abundances.tsv (count data at order level)
-class_abundances.tsv (count data at class level)
-phylum_abundances.tsv (count data at phylum level)
+species_abundance.tsv (count data at species level)
+genus_abundance.tsv (count data at genus level)
+family_abundance.tsv (count data at family level)
+order_abundance.tsv (count data at order level)
+class_abundance.tsv (count data at class level)
+phylum_abundance.tsv (count data at phylum level)
 
 
 Usage
@@ -56,19 +56,27 @@ def buildFileDescription(project_name):
     build a file description file
     '''
     file_layout=f"""
+    Directory structure
+    --------------------
+
     |-{project_name}
+    |---Files.txt
+    |---Methods.txt
     |------Reports
     |---------dada2_report.html
     |---------fastqc_report.html
     |------Data
     |---------taxa_abundances.tsv
-    |---------species_abundances.tsv
-    |---------genus_abundances.tsv
-    |---------family_abundances.tsv
-    |---------order_abundances.tsv
-    |---------class_abundances.tsv
-    |---------phylum_abundances.tsv
+    |---------species_abundance.tsv
+    |---------genus_abundance.tsv
+    |---------family_abundance.tsv
+    |---------order_abundance.tsv
+    |---------class_abundance.tsv
+    |---------phylum_abundance.tsv
     |---------merged_abundance_id.map
+
+    Description
+    ------------
 
     dada2_report.html -> Metrics on the dada2 run including reads input and output and taxonomic assignments.
     fastqc_report.html -> Quality summary of raw sequencing data.
@@ -80,6 +88,8 @@ def buildFileDescription(project_name):
     class_abundances.tsv -> Read counts for each class detected i.e. ASVs collapsed at the level of class annotation.
     phylum_abundances.tsv -> Read counts for each class detected i.e. ASVs collapsed at the level of phylum annotation.
     merged_abundance_id.map -> Text file that maps the ASV identifier (arbitrary number) to the original identified sequence byt dada2.
+    methods.txt -> Methods of data analysis
+
     """
     outf = open(f"{project_name}/Files.txt", "w")
     outf.write(file_layout)
