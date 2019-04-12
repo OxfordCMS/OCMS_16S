@@ -47,6 +47,9 @@ def mergeTaxonomyTables(infiles, outfile):
             data = line[:-1].split("\t")
             seq, tax = data[0], [data[1], data[2], data[3], data[4], data[5], data[6], data[7]]
 
+            # strip quotes from any taxon names
+            tax = [x.strip('"') for x in tax]
+            
             # remove the __ in names - will allow consistency
             # downstream
             tax = [re.sub(r"\S__", "", x) for x in tax]
