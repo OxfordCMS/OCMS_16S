@@ -255,7 +255,7 @@ heatmapMatrix <- function(mat, distfun="euclidean", clustfun="ward.D2"){
 			distfun=distf)
 	      }
 
-heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation){
+heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation, labels=TRUE, annotation.colors=list()){
 
 	      colours <- colorRampPalette(c("blue", "white", "red"))(75)
 	      mat.s <- data.frame(t(apply(mat, 1, scale)))
@@ -265,11 +265,12 @@ heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation){
 	      mat.s <- mat.s[,mixedsort(colnames(mat.s))]
 	      pheatmap(as.matrix(mat.s),
 	      color=colours,
-	      show_rownames=F,
+	      show_rownames=labels,
 	      clustering_distance_cols="correlation",
 	      clustering_method="complete",
 	      scale="none",
-	      annotation_col=sample.annotation)
+	      annotation_col=sample.annotation,
+	      annotation_colors=annotation.colors)
 	      }
 
 ################################
@@ -332,3 +333,22 @@ relab <- function(counts){
       relab <- (sweep(counts, 2, colSums(counts), "/"))*100
       return(relab)
       }
+
+#########################################
+#########################################
+# number of differentially expressed features
+#########################################
+#########################################
+
+ndiff <- function(results.table, direction="up", lfc=0){
+
+    if (direction == "up"){
+        diff <- results.table[results.table$padj < 0.05 & !(is.na(results.table$padj))
+	                      & results.table$log2FoldChange > lfc & !(is.na(results.table$log2FoldChange)),]}
+    else{
+        diff <- results.table[results.table$padj < 0.05 & !(is.na(results.table$padj))
+	                      & results.table$log2FoldChange < lfc & !(is.na(results.table$log2FoldChange)),]}
+        
+    nd <- nrow(diff)
+    return(nd)
+    }
