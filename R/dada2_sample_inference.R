@@ -109,7 +109,7 @@ flog.info(gsub("nreads", as.character(opt$`nreads`), "learning errors on the fir
 if (is.na(opt$`filtR`)){
 
    # error model inference
-   errF <- learnErrors(opt$`filtF`, multithread=TRUE, nreads=opt$`nreads`)
+   errF <- learnErrors(opt$`filtF`, multithread=FALSE, nreads=opt$`nreads`)
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
    filename <- paste(paste(directory, sample.name, sep="/"), "errF.png", sep="_")
@@ -123,7 +123,7 @@ if (is.na(opt$`filtR`)){
    flog.info("sample inference")	
    dadaF <- dada(derepF,
                  err=errF,
-		 multithread=TRUE,
+		 multithread=FALSE,
 		 OMEGA_A=opt$`omega-a`,
 		 USE_QUALS=opt$`use-quals`,
 		 USE_KMERS=opt$`use-kmers`,
@@ -178,8 +178,8 @@ if (is.na(opt$`filtR`)){
 } else {
 
    # error model learning
-   errR <- learnErrors(opt$`filtR`, multithread=TRUE, nreads=opt$`nreads`)
-   errF <- learnErrors(opt$`filtF`, multithread=TRUE, nreads=opt$`nreads`)
+   errR <- learnErrors(opt$`filtR`, multithread=FALSE, nreads=opt$`nreads`)
+   errF <- learnErrors(opt$`filtF`, multithread=FALSE, nreads=opt$`nreads`)
 
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
@@ -198,7 +198,7 @@ if (is.na(opt$`filtR`)){
    flog.info("sample inference")
    dadaF <- dada(derepF,
                  err=errF,
-		 multithread=TRUE,
+		 multithread=FALSE,
 		 OMEGA_A=opt$`omega-a`,
 		 USE_QUALS=opt$`use-quals`,
 		 USE_KMERS=opt$`use-kmers`,
@@ -214,7 +214,7 @@ if (is.na(opt$`filtR`)){
 
    dadaR <- dada(derepR,
                  err=errR,
-		 multithread=TRUE,
+		 multithread=FALSE,
 		 OMEGA_A=opt$`omega-a`,
 		 USE_QUALS=opt$`use-quals`,
 		 USE_KMERS=opt$`use-kmers`,

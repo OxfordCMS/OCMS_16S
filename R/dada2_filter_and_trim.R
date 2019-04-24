@@ -108,7 +108,7 @@ if (!(is.na(fnR))){
 			trimLeft=trimLeft,
                         maxN=opt$`maxN`,
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
-	                compress=TRUE, multithread=TRUE)
+	                compress=TRUE, multithread=FALSE)
    flog.info(paste0(paste0("writing summary to ", opt$`filtered-directory`), "/summary.tsv"))
    out <- as.data.frame(out)
    out$sample <- sample.name
@@ -123,7 +123,7 @@ if (is.na(fnR)){
 			trimLeft=trimLeft,
                         maxN=opt$`maxN`,
 			maxEE=maxEE, truncQ=opt$`truncQ`, rm.phix=TRUE,
-	                compress=TRUE, multithread=TRUE)
+	                compress=TRUE, multithread=FALSE)
    flog.info(paste0(paste0("writing summary to ", opt$`filtered-directory`), "/summary.tsv"))
    out <- as.data.frame(out)
    out$sample <- sample.name
