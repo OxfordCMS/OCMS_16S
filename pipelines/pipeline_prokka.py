@@ -8,13 +8,14 @@
 ##############################################
 
 from ruffus import *
-from cgatpipelines import pipeline as P
+import cgatcore.pipeline as P
 import cgatcore.iotools as IOTools
 import os
 import sys
 import collections
+import cgatcore.experiment as E
 
-PARAMS = P.getParameters(filenames=["pipeline.ini"])
+PARAMS = P.get_parameters(filenames=["pipeline.yml"])
 
 ##############################################
 ##############################################
@@ -30,15 +31,14 @@ def runProkka(infile, outfile):
     newdirname  = os.path.join("annotations.dir", P.snip(infile, ".fna.gz"))
     job_memory = PARAMS["prokka_memory"]
     job_threads = PARAMS["prokka_threads"]
-    prokka = "/gfs/devel/nilott/prokka/bin/prokka"
     prefix = P.snip(infile, ".fna.gz")
     t = P.snip(infile, ".gz")
     
     statement = '''zcat %(infile)s > %(t)s;
-                   %(prokka)s --cpus %(job_threads)s --outdir %(newdirname)s --prefix %(prefix)s %(t)s --force;
+                   prokka --cpus %(job_threads)s --outdir %(newdirname)s --prefix %(prefix)s %(t)s --force;
                    rm -rf *.fna
                 '''
-    P.run()
+    P.run(statement)
 
 ##############################################
 ##############################################
