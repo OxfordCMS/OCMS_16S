@@ -15,7 +15,7 @@ option_list <- list(
                            help="filtered forward fastq file [default %default]"),
                make_option(c("--filtR"), default=NA, type="character",
                            help="filtered reverse fastq file [default %default]"),
-	       make_option(c("-n", "--bases"), default=10000000,
+	       make_option(c("-n", "--nbases"), default=10000000,
                            help="number of reads to learn error model [default %default]"),
 	       make_option(c("--omega-a"), default=1e-40,
                            help="p-value for new clusters [default %default]"),
