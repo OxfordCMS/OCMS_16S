@@ -264,7 +264,7 @@ def runSampleInference(infile, outfile):
     3) merging reads (if paired)
     4) removing chimeras
     '''
-    nreads = PARAMS["sample_inference_nreads"]
+    nbases = PARAMS["sample_inference_nbases"]
     options = PARAMS["sample_inference_options"]
     outdir = os.path.dirname(outfile)
 
@@ -276,13 +276,13 @@ def runSampleInference(infile, outfile):
         statement = '''Rscript %(scriptsdir)s/dada2_sample_inference.R
                        --filtF=%(infile)s
                        --filtR=%(infile_read2)s
-                       --nreads=%(nreads)s
+                       --nbases=%(nbases)s
                        %(options)s
                        --outdir=%(outdir)s'''
     else:
         statement = '''Rscript %(scriptsdir)s/dada2_sample_inference.R
                        --filtF=%(infile)s
-                       --nreads=%(nreads)s
+                       --nbases=%(nbases)s
                        %(options)s
                        --outdir=%(outdir)s'''
 
