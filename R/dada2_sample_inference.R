@@ -15,7 +15,7 @@ option_list <- list(
                            help="filtered forward fastq file [default %default]"),
                make_option(c("--filtR"), default=NA, type="character",
                            help="filtered reverse fastq file [default %default]"),
-	       make_option(c("-n", "--nreads"), default=1000000,
+	       make_option(c("-n", "--bases"), default=10000000,
                            help="number of reads to learn error model [default %default]"),
 	       make_option(c("--omega-a"), default=1e-40,
                            help="p-value for new clusters [default %default]"),
@@ -104,12 +104,12 @@ directory <- dirname(opt$`filtF`)
 # the future
 ###########################################################################
 
-flog.info(gsub("nreads", as.character(opt$`nreads`), "learning errors on the first nreads reads"))
+flog.info(gsub("nbases", as.character(opt$`nbases`), "learning errors on the first nbases bases"))
 
 if (is.na(opt$`filtR`)){
 
    # error model inference
-   errF <- learnErrors(opt$`filtF`, multithread=FALSE, nreads=opt$`nreads`)
+   errF <- learnErrors(opt$`filtF`, multithread=FALSE, nbases=opt$`nbases`)
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
    filename <- paste(paste(directory, sample.name, sep="/"), "errF.png", sep="_")
@@ -178,8 +178,8 @@ if (is.na(opt$`filtR`)){
 } else {
 
    # error model learning
-   errR <- learnErrors(opt$`filtR`, multithread=FALSE, nreads=opt$`nreads`)
-   errF <- learnErrors(opt$`filtF`, multithread=FALSE, nreads=opt$`nreads`)
+   errR <- learnErrors(opt$`filtR`, multithread=FALSE, nbases=opt$`nbases`)
+   errF <- learnErrors(opt$`filtF`, multithread=FALSE, nbases=opt$`nbases`)
 
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
