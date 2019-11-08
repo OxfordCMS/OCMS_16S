@@ -39,7 +39,8 @@ taxonomy:
     species_file: /gfs/mirror/dada2/silva_species_assignment_v132.fa.gz
 
 report:
-
+    # whether to run diagnostics report. specify as 1 if you wish to run it
+    diagnostics:
     directory: /gfs/devel/nilott/NGSKit/pipelines/docs/Rmd/pipeline_dada2
     author: Nick Ilott
     title: Calprotectin project

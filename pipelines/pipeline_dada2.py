@@ -444,10 +444,13 @@ def build_report():
     statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i report.Rmd; cd ../'''
     P.run(statement)
 
-    # render the diagnostic report
-    statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i pipeline_dada2_diagnostics.Rmd; cd ../'''
-    P.run(statement)
-
+    if PARAMS["report_diagnostics"] == 1:
+        # render the diagnostic report
+        statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i pipeline_dada2_diagnostics.Rmd; cd ../'''
+        P.run(statement)
+    else:
+        E.info("Not running diagnostics report")
+        
     
 #########################################
 #########################################
