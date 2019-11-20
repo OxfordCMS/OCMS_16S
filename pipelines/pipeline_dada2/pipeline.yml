@@ -6,8 +6,6 @@ paired: 1
 
 scriptsdir: /gfs/devel/nilott/NGSKit/R
 
-cgatscriptsdir: /gfs/devel/nilott/cgat-developers-v0/cgat-apps/CGAT/tools
-
 trim:
 
     # parameters used for trimming reads. If the data are
@@ -27,7 +25,7 @@ sample_inference:
 
     # number of reads to use (per sample) to estimate error
     # model
-    nreads: 50000
+    nbases: 10000000
     options: ''
 
 taxonomy:
@@ -35,7 +33,7 @@ taxonomy:
     memory: 10G
 
     # assigning taxonomy
-    taxonomy_file: /gfs/mirror/dada2/silva_nr_v132_train_set.fa.gz
+    taxonomy_file: /gfs/mirror/dada2/RefSeq-RDP16S_v2_May2018.fa.gz
     species_file: /gfs/mirror/dada2/silva_species_assignment_v132.fa.gz
 
 report:
