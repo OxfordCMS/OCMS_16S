@@ -35,7 +35,7 @@ def runProkka(infile, outfile):
     t = P.snip(infile, ".gz")
     
     statement = '''zcat %(infile)s > %(t)s;
-                   prokka --cpus %(job_threads)s --outdir %(newdirname)s --prefix %(prefix)s %(t)s --force;
+                   /gfs/devel/nilott/prokka/bin/prokka --cpus %(job_threads)s --outdir %(newdirname)s --prefix %(prefix)s %(t)s --force;
                    rm -rf *.fna
                 '''
     P.run(statement)

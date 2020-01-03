@@ -4,6 +4,7 @@
 ##############################################
 
 library(data.table)
+library(pheatmap)
 
 getGenesetGenes <- function(genesets, geneset){
 
@@ -23,10 +24,10 @@ plotPathways <- function(pathway.results){
 
 	     p.dat$goid <- factor(p.dat$goid, levels=p.dat$goid)
 
-	     plot1 <- ggplot(p.dat, aes(x=goid, y=ratio, label=scount))
+	     plot1 <- ggplot(p.dat, aes(x=goid, y=ratio, label=scount, fill=goid)) 
 	     plot2 <- plot1 + geom_bar(stat="identity") + geom_text(vjust=-1)
 	     plot3 <- plot2 + theme_bw() + theme(axis.text.x=element_text(angle=90))
-	     plot4 <- plot3 + xlab("") + ylab("Fold enrichment")
+	     plot4 <- plot3 + xlab("") + ylab("Fold enrichment") + scale_fill_manual(values=rep("grey", nrow(p.dat))) + theme(legend.position = "none")
 	     return(plot4)
 	     }
 
@@ -43,7 +44,6 @@ buildGenesetGenelist <- function(pathway.table, genesets){
 		}
 
 buildGeneMatrix <- function(total, pathway.table, genesets){
-
 
 		df.list <- list()
 		for (i in 1:nrow(pathway.table)){
@@ -69,4 +69,15 @@ buildGeneMatrix <- function(total, pathway.table, genesets){
 		 rownames(full.mat) <- full.mat$gene
 		 full.mat <- full.mat[,2:ncol(full.mat)]
 		 return(full.mat)
-		 }
+}
+
+
+binaryHeatmap <- function(mat, colour="blue", labels=TRUE){
+
+    # draw heatmap
+
+    cols <- colorRampPalette(c("white", colour))(2)
+    distfun=function(x) dist(x, method="binary")
+    pheatmap(mat, color=cols, cluster_distance_rows=distfun, cluster_distance_cols=distfun, show_rownames = labels)
+}
+

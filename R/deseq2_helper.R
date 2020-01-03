@@ -255,19 +255,23 @@ heatmapMatrix <- function(mat, distfun="euclidean", clustfun="ward.D2"){
 			distfun=distf)
 	      }
 
-heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation, labels=TRUE, annotation.colors=list()){
+heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation, labels=TRUE, cluster_cols=TRUE, ngradient=75, clustering_distance="manhattan", clustering_method="ward.D", annotation.colors=list(), scale=TRUE){
 
-	      colours <- colorRampPalette(c("blue", "white", "red"))(75)
-	      mat.s <- data.frame(t(apply(mat, 1, scale)))
-	      rownames(mat.s) <- rownames(mat)
-	      colnames(mat.s) <- colnames(mat)
-	      mat.s <- na.omit(mat.s)
+	      colours <- colorRampPalette(c("blue", "white", "red"))(ngradient)
+              if (scale == TRUE){
+                  mat.s <- data.frame(t(apply(mat, 1, scale)))
+	          rownames(mat.s) <- rownames(mat)
+	          colnames(mat.s) <- colnames(mat)
+	          mat.s <- na.omit(mat.s)}
+              else{
+	          mat.s <- mat
+		  }
 	      mat.s <- mat.s[,mixedsort(colnames(mat.s))]
 	      pheatmap(as.matrix(mat.s),
 	      color=colours,
 	      show_rownames=labels,
-	      clustering_distance_cols="correlation",
-	      clustering_method="complete",
+	      clustering_distance_cols=clustering_distance,
+	      clustering_method=clustering_method,
 	      scale="none",
 	      annotation_col=sample.annotation,
 	      annotation_colors=annotation.colors)
