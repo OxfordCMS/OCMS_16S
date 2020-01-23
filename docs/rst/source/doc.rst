@@ -37,7 +37,7 @@ To activate the enviroment do the following::
 
     source </full/path/to/folder/without/trailing/slash>/conda-install/etc/profile.d/conda.sh
     conda activate base
-    conda activate cgat-f
+    conda activate cgat-flow
 
     # finally, please run the cgatflow command-line tool to check the installation:
     cgatflow --help
