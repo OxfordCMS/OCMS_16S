@@ -13,17 +13,24 @@ getGenesetGenes <- function(genesets, geneset){
 		return(genes)
 		}
 
-plotPathways <- function(pathway.results){
+plotPathways <- function(pathway.results, plot.all=FALSE, relevel=TRUE){
 
 	     p.dat <- pathway.results
+	     if (plot.all == TRUE){
+	       p.dat <- p.dat
+	     }
+	     else
+	     {
 	     p.dat <- p.dat[p.dat$code=="+",]
+	     }
 	     p.dat <- p.dat[order(p.dat$ratio, decreasing=T),]
 	     p.dat$label <- paste(round(p.dat$fdr, 3), " (", sep="")
 	     p.dat$label <- paste(p.dat$label, p.dat$scount, sep="")
 	     p.dat$label <- paste(p.dat$label, ")", sep="")
 
-	     p.dat$goid <- factor(p.dat$goid, levels=p.dat$goid)
-
+	     if (relevel == TRUE){
+	        p.dat$goid <- factor(p.dat$goid, levels=p.dat$goid)
+	     }
 	     plot1 <- ggplot(p.dat, aes(x=goid, y=ratio, label=scount, fill=goid)) 
 	     plot2 <- plot1 + geom_bar(stat="identity") + geom_text(vjust=-1)
 	     plot3 <- plot2 + theme_bw() + theme(axis.text.x=element_text(angle=90))

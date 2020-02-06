@@ -255,9 +255,9 @@ heatmapMatrix <- function(mat, distfun="euclidean", clustfun="ward.D2"){
 			distfun=distf)
 	      }
 
-heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation, labels=TRUE, cluster_cols=TRUE, ngradient=75, clustering_distance="manhattan", clustering_method="ward.D", annotation.colors=list(), scale=TRUE){
+heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation, labels=TRUE, cluster_cols=TRUE, ngradient=75, clustering_distance="manhattan", clustering_method="ward.D", annotation.colors=list(), scale=TRUE, heatcolours=colorRampPalette(c("blue", "white", "red"))(75)
+){
 
-	      colours <- colorRampPalette(c("blue", "white", "red"))(ngradient)
               if (scale == TRUE){
                   mat.s <- data.frame(t(apply(mat, 1, scale)))
 	          rownames(mat.s) <- rownames(mat)
@@ -268,7 +268,7 @@ heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation, labels=TRU
 		  }
 	      mat.s <- mat.s[,mixedsort(colnames(mat.s))]
 	      pheatmap(as.matrix(mat.s),
-	      color=colours,
+	      color=heatcolours,
 	      show_rownames=labels,
 	      clustering_distance_cols=clustering_distance,
 	      clustering_method=clustering_method,
@@ -355,4 +355,101 @@ ndiff <- function(results.table, direction="up", lfc=0){
         
     nd <- nrow(diff)
     return(nd)
-    }
+}
+
+
+getSigGeneNames <- function(results.table){
+  
+  sig <- results.table[results.table$padj < 0.05 & !(is.na(results.table$padj)),]
+  sig <- sig$gene_name
+  return(sig)
+}
+
+
+getSigGeneIDs <- function(results.table){
+  
+  sig <- results.table[results.table$padj < 0.05 & !(is.na(results.table$padj)),]
+  sig <- sig$gene_id
+  return(sig)
+}
+
+#######################################
+#######################################
+# get fold changes from matrix and
+# metadata
+#######################################
+#######################################
+
+getFoldChange <- function(mat, metadata, variable = "Tissue.location", ref="Caecum", comparison="Ileum"){
+  
+  # rownames of metadata must match colnames
+  # of mat
+  mat <- mat[,as.character(rownames(metadata))]
+  metadata <- metadata[metadata[,variable] %in% c(ref, comparison),]
+  
+  comparison <- mat[,metadata[,variable] == comparison]
+  ref <- mat[,metadata[,variable] == ref]
+  
+  fold.change <- data.frame(gene_id=rownames(mat),
+                            l2fold = rowMeans(comparison) - rowMeans(ref))
+    
+  return(fold.change)
+}
+
+getAverageExpression <- function(mat, metadata, variable = "Tissue.location", ref="Caecum", comparison="Ileum"){
+  
+  # rownames of metadata must match colnames
+  # of mat
+  mat <- mat[,as.character(rownames(metadata))]
+  metadata <- metadata[metadata[,variable] %in% c(ref, comparison),]
+  
+  comparison.df <- mat[,metadata[,variable] == comparison]
+  ref.df <- mat[,metadata[,variable] == ref]
+  
+  ave.exprs <- data.frame(gene_id=rownames(mat),
+                          ref = rowMeans(ref.df),
+                          comparison = rowMeans(comparison.df))
+  colnames(ave.exprs) <- c("gene_id", ref, comparison)
+  
+  return(ave.exprs)
+}
+
+
+
+#######################################
+#######################################
+# add annotations to expression df
+#######################################
+#######################################
+
+addAnnotation <- function(averageExpression.df, gene_ids, gene_id2gene_name){
+  
+  averageExpression.df$gene_name <- ifelse(averageExpression.df$gene_id %in% gene_ids,
+                                           gene_id2gene_name[averageExpression.df$gene_id,]$gene_name,
+                                           NA)
+  averageExpression.df$size <- ifelse(!(is.na(averageExpression.df$gene_name)), 2, 1)
+  
+  return(averageExpression.df)
+}
+
+#######################################
+#######################################
+#######################################
+#######################################
+
+buildComparisonData <- function(table1, table2, label1, label2){
+  
+  table1 <- table1[rownames(table2),]
+  comparison.data <- data.frame(table1$padj,
+                                table1$log2FoldChange,
+                                table2$padj,
+                                table2$log2FoldChange,
+                                baseMean=(table1$baseMean + table2$baseMean)/2)
+  rownames(comparison.data) <- rownames(table1)
+  colnames(comparison.data) <-  c(paste0(label1, ".padj"),
+                                  paste0(label1, ".l2fold"),
+                                  paste0(label2, ".padj"),
+                                  paste0(label2, ".l2fold"),
+                                  "baseMean")
+  return(comparison.data)
+  }
