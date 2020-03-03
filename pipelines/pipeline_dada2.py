@@ -168,6 +168,7 @@ import logging as L
 import os
 import sys
 import glob
+import re
 import PipelineDada2 as PipelineDada2
 
 ###################################################
@@ -407,6 +408,14 @@ def splitTableByTaxonomicLevels(infile, outfiles):
 @follows(buildTree, splitTableByTaxonomicLevels)
 def full():
     pass
+
+@transform([buildDefinitiveTable, splitTableByTaxonomicLevels, filterAndTrim], regex("(.*).tsv"), r"\1.load")
+def build_db(infile, outfile):
+
+    # put all filtered summary into one file
+    file_filt = re.findall(".*summary.tsv", infile)
+    
+    P.load(infile, outfile)
 
 #########################################
 #########################################
