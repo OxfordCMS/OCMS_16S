@@ -170,6 +170,7 @@ import sys
 import glob
 import re
 import PipelineDada2 as PipelineDada2
+import pandas as pd
 
 ###################################################
 ###################################################
@@ -412,10 +413,29 @@ def full():
 @transform([buildDefinitiveTable, splitTableByTaxonomicLevels, filterAndTrim], regex("(.*).tsv"), r"\1.load")
 def build_db(infile, outfile):
 
-    # put all filtered summary into one file
-    file_filt = re.findall(".*summary.tsv", infile)
+    # ********** file names not unique******************
+    # put all filtered summary into one table
+    filt_file = re.findall(r".*summary.tsv", infile)
+
+    # initiate empty dataframe
+    col_name = ["reads.in", "reads.out", "sample"]
+    qc_filt =  []
     
-    P.load(infile, outfile)
+    for filt in filt_file:
+        entry = pd.read_csv(filt, index_col = None, header = 0, sep = "\t")
+        qc_filt.append(entry)
+
+    qc_filt = pd.concat(qc_filt, axis = 0, ignore_index = True)
+    qc_filt = pd.melt(qc_filt, id_vars=['sample'],
+                      value_vars=['reads.in', 'reads.out'])
+
+    # put all abundance summary into one table
+    chim_file = re.findall(r".*summary.tsv", infile))
+    
+    # gather files to add to db
+    merged_tax = re.findall(r"merged_taxonomy.tsv", infile)
+    merged_count = re.findall(r"species_abundance.tsv", infile)
+    #P.load(infile, outfile)
 
 #########################################
 #########################################
