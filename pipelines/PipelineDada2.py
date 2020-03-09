@@ -7,6 +7,7 @@
 ##################################################
 
 import re
+import os
 import itertools
 
 def seq2id(seqtable, outfile_map, outfile_table):
@@ -39,9 +40,22 @@ def mergeTaxonomyTables(infiles, outfile):
     '''
     merge taxonomy files
     '''
+
+    # read in mapping file
+    id_dict = {}
+    id_map = open("abundance.dir/merged_abundance_id.map", 'r')
+    id_map.readline()
+    for line in id_map.readlines():
+        entry = line.strip("\n").split("\t")
+        id_dict[entry[1]] = entry[0]
+
+    # taxonomy files
+    pattern = r"seq_taxonomy\.tsv"
+    tax_files = [x for x in infiles if re.search(pattern, x)]
+
     taxonomy = {}
-    for infile in infiles:
-        inf = open(infile)
+    for infile in tax_files:
+        inf = open(infile, "r")
         inf.readline()
         for line in inf.readlines():
             data = line[:-1].split("\t")
@@ -49,22 +63,33 @@ def mergeTaxonomyTables(infiles, outfile):
 
             # strip quotes from any taxon names
             tax = [x.strip('"') for x in tax]
-            
-            # remove the __ in names - will allow consistency
-            # downstream
-            tax = [re.sub(r"\S__", "", x) for x in tax]
 
             # replace missing data with NA
             tax = ["NA" if x=='' else x for x in tax]
+            
+            # keep joined version of taxa to add as Taxon column; add on tax level prefix
+            prefix = ['k','p','c','o','f','g','s']
+            taxon = [prefix[i] + "__" + x for i,x in enumerate(tax)]
+            taxon = ";".join(taxon)
+
+            tax.append(taxon)
+
+            # remove the __ in names - will allow consistency
+            # downstream
+            # tax = [re.sub(r"\S__", "", x) for x in tax]
 
             # check there are the correct number of elements
-            assert len(tax) == 7, "Not enough levels in %s" % ", ".join(tax)
+            assert len(tax) == 8, "Not enough levels in %s" % ", ".join(tax)
             taxonomy[seq] = tax
 
+        inf.close()
+
+    # write merged taxonomy file
     outf = open(outfile, "w")
-    outf.write("sequence\tKingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies\n")
+    outf.write("featureID\tsequence\tKingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies\tTaxon\n")
     for seq, taxa in taxonomy.items():
-        outf.write(seq + "\t" + "\t".join(taxa) + "\n")
+        entry = id_dict[seq] + "\t" + seq + "\t" + "\t".join(taxa) + "\n"
+        outf.write(entry)
     outf.close()
 
 
@@ -144,6 +169,63 @@ def buildTree(infile, outfile):
         outf.write(f'{asv_taxon}\n')
     outf.close()
 
+##################################################
+##################################################
+##################################################
 
+def mergeFilterSummary(infiles, outfile):
 
-        
+    '''
+    merge all filter summaries in filter.dir
+    into merge_filter_summary.tsv
+    '''
+
+    # identify filter summaries
+    fname = [os.path.basename(x) for x in infiles]
+    pattern = r".*(?=\.fastq)"
+    result = [m.group(0) for x in fname for m in [re.search(pattern, x)] if m]
+    summary_file = [x + "_summary.tsv" for x in result]
+
+    # initiate merged summary file
+    merged = open(outfile, "w")
+    merged.write("reads.in\treads.out\tsample\n")
+
+    # read one summary file at a time
+    for f in summary_file:
+        with open(os.path.join('filtered.dir', f), "r") as curr_file:
+            entry = curr_file.readlines()[1]
+            merged.write(entry)
+        curr_file.close()
+    merged.close()
+
+###################################################
+###################################################
+###################################################
+def mergeQCSummary(infiles, outfile):
+    '''
+    merge all qc summaries into one file
+    into merge_qc_summary.tsv)
+    '''
+    
+    # identify filter summaries
+    fname = [os.path.basename(x) for x in infiles]
+    print(fname)
+    pattern = r".*(?=_seq_abundance.tsv)"
+    result = [m.group(0) for x in fname for m in [re.search(pattern, x)] if m]
+    summary_file = [x + "_summary.tsv" for x in result]
+    # initiate merged summary file
+    merged = open(outfile, "w")
+    merged.write("denoised\tnochim\tsample\n")
+
+    # read one summary file at a time
+    for f in summary_file:
+        with open(os.path.join('abundance.dir', f), "r") as curr_file:
+            entry = curr_file.readlines()[1]
+            merged.write(entry)
+        curr_file.close()
+    merged.close()
+
+#####################################################
+#####################################################
+#####################################################
+                     

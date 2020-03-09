@@ -331,19 +331,7 @@ def assignTaxonomy(infile, outfile):
                    --species-file=%(species_file)s
                    -o %(outfile)s'''
     P.run(statement)
-    
-###################################################
-###################################################
-###################################################
 
-@merge(assignTaxonomy, "taxonomy.dir/merged_taxonomy.tsv")
-def mergeTaxonomyTables(infiles, outfile):
-    '''
-    combine sequence/taxonomy tables across
-    samples
-    '''
-    PipelineDada2.mergeTaxonomyTables(infiles, outfile)
-    
 ###################################################
 ###################################################
 ###################################################
@@ -357,6 +345,19 @@ def addUniqueIdentifiers(infile, outfile):
     PipelineDada2.seq2id(infile,
                          outfile_map,
                          outfile)
+    
+###################################################
+###################################################
+###################################################
+
+@merge([assignTaxonomy, addUniqueIdentifiers], "taxonomy.dir/merged_taxonomy.tsv")
+def mergeTaxonomyTables(infiles, outfile):
+    '''
+    combine sequence/taxonomy tables across
+    samples
+    '''
+    PipelineDada2.mergeTaxonomyTables(infiles, outfile)
+    
 
 #########################################
 #########################################
@@ -410,32 +411,42 @@ def splitTableByTaxonomicLevels(infile, outfiles):
 def full():
     pass
 
-@transform([buildDefinitiveTable, splitTableByTaxonomicLevels, filterAndTrim], regex("(.*).tsv"), r"\1.load")
-def build_db(infile, outfile):
-
-    # ********** file names not unique******************
-    # put all filtered summary into one table
-    filt_file = re.findall(r".*summary.tsv", infile)
-
-    # initiate empty dataframe
-    col_name = ["reads.in", "reads.out", "sample"]
-    qc_filt =  []
+#########################################
+#########################################
+#########################################
+@follows(filterAndTrim)
+@merge(filterAndTrim, "filtered.dir/merged_filter_summary.tsv")
+def mergeFilterSummary(infiles, outfile):
+    '''
+    Merging all filter summaries into one file
+    reads.in    reads.out    sample
+    '''
     
-    for filt in filt_file:
-        entry = pd.read_csv(filt, index_col = None, header = 0, sep = "\t")
-        qc_filt.append(entry)
+    PipelineDada2.mergeFilterSummary(infiles, outfile)
 
-    qc_filt = pd.concat(qc_filt, axis = 0, ignore_index = True)
-    qc_filt = pd.melt(qc_filt, id_vars=['sample'],
-                      value_vars=['reads.in', 'reads.out'])
-
-    # put all abundance summary into one table
-    chim_file = re.findall(r".*summary.tsv", infile))
     
-    # gather files to add to db
-    merged_tax = re.findall(r"merged_taxonomy.tsv", infile)
-    merged_count = re.findall(r"species_abundance.tsv", infile)
-    #P.load(infile, outfile)
+@follows(runSampleInference)
+@merge(runSampleInference, "abundance.dir/merged_qc_summary.tsv")
+def mergeQCSummary(infiles, outfile):
+    '''
+    Merging all qc summaries into one file
+    denoised    nochim    sample
+    '''
+
+    PipelineDada2.mergeQCSummary(infiles, outfile)
+
+
+@transform([mergeAbundanceTables, mergeTaxonomyTables, mergeFilterSummary, mergeQCSummary], regex(r"(.*)\.tsv"), r"\1.load")
+def build_db(infiles, outfile):
+    '''
+    Stores data generated throughout pipeline as a sqlite database.
+    Structure of data tables and database is meant for compatibility
+    with the shiny app
+    '''
+    # store info in yml file as a table
+    
+    
+    P.load(infiles, outfile)
 
 #########################################
 #########################################
