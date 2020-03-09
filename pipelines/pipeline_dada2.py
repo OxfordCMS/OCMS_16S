@@ -443,9 +443,11 @@ def build_db(infiles, outfile):
     with the shiny app
     '''
     # store info in yml file as a table
-    
-    
     P.load(infiles, outfile)
+
+    # add index to each table
+    statement = '''sqlite3 csvdb; CREATE UNIQUE INDEX merged_taxonomy ON merged_abundance (sequence); .quit'''
+    P.run(statement)
 
 #########################################
 #########################################
