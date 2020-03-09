@@ -7,6 +7,7 @@
 suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("dada2"))
 suppressPackageStartupMessages(library("futile.logger"))
+suppressPackageStartupMessages(library("dplyr"))
 
 # make options list
 option_list <- list(

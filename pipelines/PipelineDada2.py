@@ -19,7 +19,7 @@ def seq2id(seqtable, outfile_map, outfile_table):
     header = inf.readline()
     c = 1
     out_map = open(outfile_map, "w")
-    out_map.write("id\tsequence\n")
+    out_map.write("id\tfeatureID\n")
     out_table = open(outfile_table, "w")
     out_table.write(header)
     for line in inf.readlines():
@@ -97,50 +97,47 @@ def mergeTaxonomyTables(infiles, outfile):
 ##################################################
 ##################################################
 
-def makeDefinitiveAbundanceFile(id2seq, seq2taxonomy, id2abundance, outfile):
+def makeDefinitiveAbundanceFile(infiles, outfile):
     '''
     make a definitive table of abundances of the form:
-    ASVXXX:p__phylum;c__class;o__order;f__family;g__genus;s__species    21
+    ASVXXX:k__kingdom;p__phylum;c__class;o__order;f__family;g__genus;s__species    21
     ...
     '''
-    inf_id2seq = open(id2seq)
-    inf_id2seq.readline()
-    inf_seq2taxonomy = open(seq2taxonomy)
-    inf_seq2taxonomy.readline()
-    inf_id2abundance = open(id2abundance)
-    header = inf_id2abundance.readline()
-    
-    id2seq_dict = {}
-    seq2taxonomy_dict = {}
+    # read in taxonomy file (contains all id keys)
+    tax_file = open(infiles[1], 'r')
+    tax_file.readline()
 
-    for line in inf_id2seq.readlines():
-        data = line[:-1].split("\t")
-        id2seq_dict[data[0]] = data[1]
+    # read in sequence counts (id by sequence)
+    seq_file = open(infiles[0], 'r')
+    seq_file.readline()
 
-    for line in inf_seq2taxonomy.readlines():
-        data = line[:-1].split("\t")
-        # from phylum level
-        taxonomy = data[2:]
-        taxonomy[0] = "p__" + taxonomy[0]
-        taxonomy[1] = "c__" + taxonomy[1]
-        taxonomy[2] = "o__" + taxonomy[2]
-        taxonomy[3] = "f__" + taxonomy[3]
-        taxonomy[4] = "g__" + taxonomy[4]
-        taxonomy[5] = "s__" + taxonomy[5]
-        taxonomy = ";".join(taxonomy)
-        
-        seq2taxonomy_dict[data[0]] = taxonomy
+    # create dictionary for identifiers
+    id_dict = {}
 
-    # iterate over abundance file and create
-    # new names
+    for line in tax_file.readlines():
+        data = line.strip("\n").split("\t")
+        values = [x for i, x in enumerate(data) if i != 1]
+        id_dict[data[1]] = values
+    tax_file.close()
+
+
+    # initiate output file with modified header from merged_abundance
     outfile = open(outfile, "w")
-    outfile.write(header)
-    for line in inf_id2abundance.readlines():
-        data = line[:-1].split("\t")
+    with open(infiles[0], 'r') as f:
+        header = f.readline().strip("\n").split("\t")
+        header[0] = 'featureID'
+    outfile.write("\t".join(header) + "\n")
+    
+    # iterate over abundance file and create new names
+    for line in seq_file.readlines():
+        data = line.strip("\n").split("\t")
+
+        # look up sequence in id dictionary made from
+        # merged taxonomy file
         identifier = data[0]
-        seq = id2seq_dict[identifier]
-        taxonomy = seq2taxonomy_dict[seq]
-        newid = ":".join([identifier, taxonomy])
+        id_value = id_dict.get(identifier)
+        newid = id_value[0] + ":" + id_value[-1]
+    
         outfile.write("\t".join([newid] + data[1:]) + "\n")
     outfile.close()
     

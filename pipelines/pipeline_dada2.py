@@ -350,7 +350,8 @@ def addUniqueIdentifiers(infile, outfile):
 ###################################################
 ###################################################
 
-@merge([assignTaxonomy, addUniqueIdentifiers], "taxonomy.dir/merged_taxonomy.tsv")
+@merge([assignTaxonomy, addUniqueIdentifiers],
+       "taxonomy.dir/merged_taxonomy.tsv")
 def mergeTaxonomyTables(infiles, outfile):
     '''
     combine sequence/taxonomy tables across
@@ -363,16 +364,14 @@ def mergeTaxonomyTables(infiles, outfile):
 #########################################
 #########################################
 
-@merge([addUniqueIdentifiers, mergeTaxonomyTables], "abundance.dir/taxa_abundances.tsv")
+@merge([mergeAbundanceTables, mergeTaxonomyTables],
+       "abundance.dir/taxa_abundances.tsv")
 def buildDefinitiveTable(infiles, outfile):
     '''
     build the final table with newids and
     abundance information
     '''
-    PipelineDada2.makeDefinitiveAbundanceFile(infiles[0].replace(".tsv", ".map"),
-                                              infiles[1],
-                                              infiles[0],
-                                              outfile)
+    PipelineDada2.makeDefinitiveAbundanceFile(infiles, outfile)
 
 #########################################
 #########################################
