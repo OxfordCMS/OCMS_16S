@@ -410,9 +410,12 @@ def splitTableByTaxonomicLevels(infile, outfiles):
 def full():
     pass
 
+
 #########################################
 #########################################
 #########################################
+
+# merge filter summaries into one table
 @follows(filterAndTrim)
 @merge(filterAndTrim, "filtered.dir/merged_filter_summary.tsv")
 def mergeFilterSummary(infiles, outfile):
@@ -423,7 +426,12 @@ def mergeFilterSummary(infiles, outfile):
     
     PipelineDada2.mergeFilterSummary(infiles, outfile)
 
-    
+
+#########################################
+#########################################
+#########################################
+
+# merge qc summaries into one table
 @follows(runSampleInference)
 @merge(runSampleInference, "abundance.dir/merged_qc_summary.tsv")
 def mergeQCSummary(infiles, outfile):
@@ -435,19 +443,50 @@ def mergeQCSummary(infiles, outfile):
     PipelineDada2.mergeQCSummary(infiles, outfile)
 
 
-@transform([mergeAbundanceTables, mergeTaxonomyTables, mergeFilterSummary, mergeQCSummary], regex(r"(.*)\.tsv"), r"\1.load")
+#########################################
+#########################################
+#########################################
+
+# export tables into sqlite database for app compatibility
+@transform([mergeAbundanceTables, mergeTaxonomyTables,
+            mergeFilterSummary, mergeQCSummary],
+           regex(r"(.*)\.tsv"), r"\1.load")
 def build_db(infiles, outfile):
     '''
     Stores data generated throughout pipeline as a sqlite database.
     Structure of data tables and database is meant for compatibility
     with the shiny app
     '''
-    # store info in yml file as a table
-    P.load(infiles, outfile)
+
+    # expand parameters dictionary so only one value per key
+    key_list = []
+    val_list = []
+    for key, value in PARAMS.items():
+       
+       if len(value) > 1:
+           for i, x in enumerate(value):
+               entry = key + str(i)
+               key_list.append(entry)
+               val_list.append(x)
+        
+    # record pipeline.yml into a table
+    yml_table = pd.Dataframe(list(zip(key_list, val_list)),
+                             columns = ['parameter','value'])
+
+    # write table to file
+    yml_table.to_csv("parameter_table.csv", index = false)
+
+    tables = infiles
+    tables.append('parameter_table.csv')
+    
+    # record merged_filter_summary, merged_qc_summary,
+    # merged_taxonomy, merged_abundance_id
+    # and yml table in database
+    P.load(tables, outfile)
 
     # add index to each table
-    statement = '''sqlite3 csvdb; CREATE UNIQUE INDEX merged_taxonomy ON merged_abundance (sequence); .quit'''
-    P.run(statement)
+    # statement = '''sqlite3 csvdb; CREATE UNIQUE INDEX merged_taxonomy ON merged_abundance (sequence); .quit'''
+    # P.run(statement)
 
 #########################################
 #########################################
