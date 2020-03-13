@@ -9,6 +9,7 @@
 import re
 import os
 import itertools
+import pandas as pd
 
 def seq2id(seqtable, outfile_map, outfile_table):
     '''
@@ -225,4 +226,46 @@ def mergeQCSummary(infiles, outfile):
 #####################################################
 #####################################################
 #####################################################
-                     
+# save pipeline.yml file as dataframe (tsv)
+
+def yml2Table(param_dict, outfile):
+
+    # expand parameters dictionary so only one value per key
+    key_list = []
+    val_list = []
+    for key in param_dict.keys():
+
+        curr_val = param_dict[key]
+
+        # if value is a dictionary, unpack dictionary values
+        if isinstance(curr_val, dict):
+            for k in curr_val.keys():
+                v = curr_val[k]
+
+                # convert value to list of strings
+                ## when nested dict value is one value
+                ## immediately update output lists
+                if isinstance(v, list) == False:
+                    key_list.append(k)
+                    val_list.append(str(v))
+                ## when nested dict value is list
+                ## split up list so one value per key
+                else:
+                    for i, x in enumerate(v):
+                        entry_key = str(k) + str(i)
+                        key_list.append(entry_key)
+                        val_list.append(x)
+
+        # assuming only single values in non-dictionary values
+        # so can add directly to output lists
+        else:
+            key_list.append(str(key))
+            val_list.append(str(curr_val))
+    
+    # record pipeline.yml into a table
+    yml_table = pd.DataFrame(list(zip(key_list, val_list)),
+                             columns = ['parameter','value'])
+
+    # write table to file
+    yml_table.to_csv(outfile, index = False, sep = "\t")
+   
