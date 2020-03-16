@@ -186,7 +186,7 @@ A useful metric is the number of ASVs that were called per sample even though we
 
 # read ASV counts and reformat
 dat <- data.frame(fread("abundance.dir/taxa_abundances.tsv", header=TRUE, stringsAsFactors=F, sep="\t"))
-rownames(dat) <- dat$sequence
+rownames(dat) <- dat$featureID
 dat <- dat[,2:ncol(dat)]
 colnames(dat) <- factor(sample.map[gsub("\\.", "-", colnames(dat)),]$reportId, levels=ids)
 
@@ -277,7 +277,7 @@ The next stage is to assign each of the amplicon sequence variants (ASV) to a ta
 # phylum level only for visualisation purposes
 
 p <- gsub(";c__.*", "", rownames(dat))
-p <- gsub("ASV[0-9]*:", "", p)
+p <- gsub("ASV[0-9]*:k__[a-zA-Z]+;", "", p)
 dp <- melt(aggregate(dat, list(p), sum))
 
 # again lifted from AmpSeqKit.
