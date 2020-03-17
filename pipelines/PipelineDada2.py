@@ -17,12 +17,13 @@ def seq2id(seqtable, outfile_map, outfile_table):
     sequence in dada2 output
     '''
     inf = open(seqtable)
-    header = inf.readline()
+    header = inf.readline().strip('\n').split('\t')
+    header = ["featureID"] + header[1:]
     c = 1
     out_map = open(outfile_map, "w")
     out_map.write("id\tfeatureID\n")
     out_table = open(outfile_table, "w")
-    out_table.write(header)
+    out_table.write('\t'.join(header) + "\n")
     for line in inf.readlines():
         data = line[:-1].split("\t")
         seq = data[0]
