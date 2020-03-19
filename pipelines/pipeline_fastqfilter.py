@@ -13,10 +13,8 @@ Filter fastq files based on reads unmapped in bam file
 # load modules
 from ruffus import *
 
-import CGAT.Experiment as E
+import cgatcore.experiment as E
 import logging as L
-import CGAT.Database as Database
-import CGAT.CSV as CSV
 
 import sys
 import os
@@ -29,24 +27,8 @@ import time
 import gzip
 import collections
 import random
-
-import numpy
-import sqlite3
-import CGAT.GTF as GTF
-import CGAT.IOTools as IOTools
-import CGAT.IndexedFasta as IndexedFasta
-from rpy2.robjects import r as R
-import rpy2.robjects as ro
-import rpy2.robjects.vectors as rovectors
-from rpy2.rinterface import RRuntimeError
-import CGATPipelines.PipelineMapping as PipelineMapping
-#import CGATPipelines.PipelineMetagenomeAssembly as PipelineMetagenomeAssembly
-import CGAT.FastaIterator as FastaIterator
-import CGAT.Metaphlan as Metaphlan
-import CGATPipelines.PipelineMapping as PipelineMapping
-import CGATPipelines.PipelineMappingQC as PipelineMappingQC
-import pysam
-import CGAT.Fastq as Fastq
+import cgat.FastaIterator as FastaIterator
+import cgat.Fastq as Fastq
 
 ###################################################
 ###################################################
@@ -55,8 +37,8 @@ import CGAT.Fastq as Fastq
 ###################################################
 
 # load options from the config file
-import CGATPipelines.Pipeline as P
-P.getParameters(
+import cgatcore.pipeline as P
+P.get_parameters(
     ["pipeline.ini"])
 
 PARAMS = P.PARAMS

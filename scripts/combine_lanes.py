@@ -12,7 +12,7 @@ def readWt2id(wt2id):
     read identifier map into dictionary
     '''
     mapping = {}
-    inf = open(wt2id)
+    inf = open(wt2id, encoding="utf_8_sig")
     for line in inf.readlines():
         data = line[:-1].split("\t")
         mapping[data[0]] = data[1]
@@ -20,7 +20,7 @@ def readWt2id(wt2id):
 
 def combineLanesRead1(directory, mapping_dict):
     '''
-    read1 combination
+    read combination
     '''
     read1s = glob.glob(os.path.join(directory, "*_1.fastq.gz"))
     read1s.sort()
@@ -34,10 +34,14 @@ def combineLanesRead1(directory, mapping_dict):
             continue
         else:
             found_index.add(index)
-            tocombine = " ".join([x for x in read1s if index in x])
+            reads = [x for x in read1s if index in x]
+            tocombine = " ".join(reads)
             newname = mapping_dict[prefix] + ".fastq.1.gz"
             out_map.write(tocombine + " " + newname + "\n")
-            statement = f"""cat {tocombine} > {newname}"""
+            if len(reads) == 1:
+                statement = f"""ln -s {tocombine}  {newname}"""
+            else:
+                statement = f"""cat {tocombine} > {newname}"""
             os.system(statement)
 
 def combineLanesRead2(directory, mapping_dict):
@@ -56,10 +60,14 @@ def combineLanesRead2(directory, mapping_dict):
             continue
         else:
             found_index.add(index)
-            tocombine = " ".join([x for x in read2s if index in x])
+            reads = [x for x in read2s if index in x]
+            tocombine = " ".join(reads)
             newname = mapping_dict[prefix] + ".fastq.2.gz"
             out_map.write(tocombine + " " + newname + "\n")
-            statement = f"""cat {tocombine} > {newname}"""
+            if len(reads) == 1:
+                statement = f"""ln -s {tocombine}  {newname}"""
+            else:
+                statement = f"""cat {tocombine} > {newname}"""
             os.system(statement)
 
 wt2id = readWt2id(wt2id)
