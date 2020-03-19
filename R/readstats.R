@@ -21,7 +21,6 @@ getSamples <- function(db){
 		  }
 	      return(rsamples)
 	      }
-
 getSampleQC <- function(db, sample, metric){
 	      sqlite <- dbDriver("SQLite")
 	      db <- dbConnect(sqlite, db)

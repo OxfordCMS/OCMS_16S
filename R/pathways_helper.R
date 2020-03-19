@@ -13,7 +13,7 @@ getGenesetGenes <- function(genesets, geneset){
 		return(genes)
 		}
 
-plotPathways <- function(pathway.results, plot.all=FALSE, relevel=TRUE){
+plotPathways <- function(pathway.results, plot.all=FALSE, relevel=TRUE, text.size=6, x.label="description"){
 
 	     p.dat <- pathway.results
 	     if (plot.all == TRUE){
@@ -32,7 +32,7 @@ plotPathways <- function(pathway.results, plot.all=FALSE, relevel=TRUE){
 	        p.dat$goid <- factor(p.dat$goid, levels=p.dat$goid)
 	     }
 	     plot1 <- ggplot(p.dat, aes(x=goid, y=ratio, label=scount, fill=goid)) 
-	     plot2 <- plot1 + geom_bar(stat="identity") + geom_text(vjust=-1)
+	     plot2 <- plot1 + geom_bar(stat="identity") + geom_text(vjust=-1, size=text.size)
 	     plot3 <- plot2 + theme_bw() + theme(axis.text.x=element_text(angle=90))
 	     plot4 <- plot3 + xlab("") + ylab("Fold enrichment") + scale_fill_manual(values=rep("grey", nrow(p.dat))) + theme(legend.position = "none")
 	     return(plot4)

@@ -273,6 +273,7 @@ heatmapMatrixWithSampleAnnotation <- function(mat, sample.annotation, labels=TRU
 	      clustering_distance_cols=clustering_distance,
 	      clustering_method=clustering_method,
 	      scale="none",
+	      cluster_cols=cluster_cols,
 	      annotation_col=sample.annotation,
 	      annotation_colors=annotation.colors)
 	      }
@@ -452,4 +453,26 @@ buildComparisonData <- function(table1, table2, label1, label2){
                                   paste0(label2, ".l2fold"),
                                   "baseMean")
   return(comparison.data)
+}
+
+buildAnnotations <- function(mat, list1, list2){
+  
+  # build a set of annotations
+  res <- data.frame(gene_id = rownames(mat),
+                    annotation = rep(NA, nrow(mat)))
+  for (i in 1:length(res$gene_id)){
+    gene <- res$gene_id[i]
+    if (gene %in% list1 & gene %in% list2){
+      res$annotation[i] <- "both"}
+    else if (gene %in% list1){
+      res$annotation[i] <- "list1"}
+    else if (gene %in% list2){
+      res$annotation[i] <- "list2"}
   }
+  rownames(res) <- res$gene_id
+  res2 <- data.frame(annotation = res[,2])
+  rownames(res2) <- res$gene_id
+  return(res2)
+  }
+
+
