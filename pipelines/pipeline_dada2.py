@@ -230,7 +230,7 @@ def filterAndTrim(infile, outfile):
         paired = ""
         infiles = [infile]
 
-    tmpdr = P.get_temp_dir()
+    tmpdir = P.get_temp_dir()
     for inf in infiles:
         outtmp = os.path.join(tmpdir, inf.replace(".gz", ""))
         statement = '''zcat %(inf)s > %(outtmp)s'''

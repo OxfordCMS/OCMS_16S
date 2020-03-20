@@ -208,7 +208,7 @@ def mergeQCSummary(infiles, outfile):
     
     # identify filter summaries
     fname = [os.path.basename(x) for x in infiles]
-    print(fname)
+    
     pattern = r".*(?=_seq_abundance.tsv)"
     result = [m.group(0) for x in fname for m in [re.search(pattern, x)] if m]
     summary_file = [x + "_summary.tsv" for x in result]
