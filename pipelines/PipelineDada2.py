@@ -7,7 +7,9 @@
 ##################################################
 
 import re
+import os
 import itertools
+import pandas as pd
 
 def seq2id(seqtable, outfile_map, outfile_table):
     '''
@@ -15,12 +17,13 @@ def seq2id(seqtable, outfile_map, outfile_table):
     sequence in dada2 output
     '''
     inf = open(seqtable)
-    header = inf.readline()
+    header = inf.readline().strip('\n').split('\t')
+    header = ["featureID"] + header[1:]
     c = 1
     out_map = open(outfile_map, "w")
-    out_map.write("id\tsequence\n")
+    out_map.write("id\tfeatureID\n")
     out_table = open(outfile_table, "w")
-    out_table.write(header)
+    out_table.write('\t'.join(header) + "\n")
     for line in inf.readlines():
         data = line[:-1].split("\t")
         seq = data[0]
@@ -39,9 +42,22 @@ def mergeTaxonomyTables(infiles, outfile):
     '''
     merge taxonomy files
     '''
+
+    # read in mapping file
+    id_dict = {}
+    id_map = open("abundance.dir/merged_abundance_id.map", 'r')
+    id_map.readline()
+    for line in id_map.readlines():
+        entry = line.strip("\n").split("\t")
+        id_dict[entry[1]] = entry[0]
+
+    # taxonomy files
+    pattern = r"seq_taxonomy\.tsv"
+    tax_files = [x for x in infiles if re.search(pattern, x)]
+
     taxonomy = {}
-    for infile in infiles:
-        inf = open(infile)
+    for infile in tax_files:
+        inf = open(infile, "r")
         inf.readline()
         for line in inf.readlines():
             data = line[:-1].split("\t")
@@ -49,22 +65,33 @@ def mergeTaxonomyTables(infiles, outfile):
 
             # strip quotes from any taxon names
             tax = [x.strip('"') for x in tax]
-            
-            # remove the __ in names - will allow consistency
-            # downstream
-            tax = [re.sub(r"\S__", "", x) for x in tax]
 
             # replace missing data with NA
             tax = ["NA" if x=='' else x for x in tax]
+            
+            # keep joined version of taxa to add as Taxon column; add on tax level prefix
+            prefix = ['k','p','c','o','f','g','s']
+            taxon = [prefix[i] + "__" + x for i,x in enumerate(tax)]
+            taxon = ";".join(taxon)
+
+            tax.append(taxon)
+
+            # remove the __ in names - will allow consistency
+            # downstream
+            # tax = [re.sub(r"\S__", "", x) for x in tax]
 
             # check there are the correct number of elements
-            assert len(tax) == 7, "Not enough levels in %s" % ", ".join(tax)
+            assert len(tax) == 8, "Not enough levels in %s" % ", ".join(tax)
             taxonomy[seq] = tax
 
+        inf.close()
+
+    # write merged taxonomy file
     outf = open(outfile, "w")
-    outf.write("sequence\tKingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies\n")
+    outf.write("featureID\tsequence\tKingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies\tTaxon\n")
     for seq, taxa in taxonomy.items():
-        outf.write(seq + "\t" + "\t".join(taxa) + "\n")
+        entry = id_dict[seq] + "\t" + seq + "\t" + "\t".join(taxa) + "\n"
+        outf.write(entry)
     outf.close()
 
 
@@ -72,50 +99,47 @@ def mergeTaxonomyTables(infiles, outfile):
 ##################################################
 ##################################################
 
-def makeDefinitiveAbundanceFile(id2seq, seq2taxonomy, id2abundance, outfile):
+def makeDefinitiveAbundanceFile(infiles, outfile):
     '''
     make a definitive table of abundances of the form:
-    ASVXXX:p__phylum;c__class;o__order;f__family;g__genus;s__species    21
+    ASVXXX:k__kingdom;p__phylum;c__class;o__order;f__family;g__genus;s__species    21
     ...
     '''
-    inf_id2seq = open(id2seq)
-    inf_id2seq.readline()
-    inf_seq2taxonomy = open(seq2taxonomy)
-    inf_seq2taxonomy.readline()
-    inf_id2abundance = open(id2abundance)
-    header = inf_id2abundance.readline()
-    
-    id2seq_dict = {}
-    seq2taxonomy_dict = {}
+    # read in taxonomy file (contains all id keys)
+    tax_file = open(infiles[1], 'r')
+    tax_file.readline()
 
-    for line in inf_id2seq.readlines():
-        data = line[:-1].split("\t")
-        id2seq_dict[data[0]] = data[1]
+    # read in sequence counts (id by sequence)
+    seq_file = open(infiles[0], 'r')
+    seq_file.readline()
 
-    for line in inf_seq2taxonomy.readlines():
-        data = line[:-1].split("\t")
-        # from phylum level
-        taxonomy = data[2:]
-        taxonomy[0] = "p__" + taxonomy[0]
-        taxonomy[1] = "c__" + taxonomy[1]
-        taxonomy[2] = "o__" + taxonomy[2]
-        taxonomy[3] = "f__" + taxonomy[3]
-        taxonomy[4] = "g__" + taxonomy[4]
-        taxonomy[5] = "s__" + taxonomy[5]
-        taxonomy = ";".join(taxonomy)
-        
-        seq2taxonomy_dict[data[0]] = taxonomy
+    # create dictionary for identifiers
+    id_dict = {}
 
-    # iterate over abundance file and create
-    # new names
+    for line in tax_file.readlines():
+        data = line.strip("\n").split("\t")
+        values = [x for i, x in enumerate(data) if i != 1]
+        id_dict[data[1]] = values
+    tax_file.close()
+
+
+    # initiate output file with modified header from merged_abundance
     outfile = open(outfile, "w")
-    outfile.write(header)
-    for line in inf_id2abundance.readlines():
-        data = line[:-1].split("\t")
+    with open(infiles[0], 'r') as f:
+        header = f.readline().strip("\n").split("\t")
+        header[0] = 'featureID'
+    outfile.write("\t".join(header) + "\n")
+    
+    # iterate over abundance file and create new names
+    for line in seq_file.readlines():
+        data = line.strip("\n").split("\t")
+
+        # look up sequence in id dictionary made from
+        # merged taxonomy file
         identifier = data[0]
-        seq = id2seq_dict[identifier]
-        taxonomy = seq2taxonomy_dict[seq]
-        newid = ":".join([identifier, taxonomy])
+        id_value = id_dict.get(identifier)
+        newid = id_value[0] + ":" + id_value[-1]
+    
         outfile.write("\t".join([newid] + data[1:]) + "\n")
     outfile.close()
     
@@ -144,6 +168,112 @@ def buildTree(infile, outfile):
         outf.write(f'{asv_taxon}\n')
     outf.close()
 
+##################################################
+##################################################
+##################################################
 
+def mergeFilterSummary(infiles, outfile):
 
+    '''
+    merge all filter summaries in filter.dir
+    into merge_filter_summary.tsv
+    '''
+
+    # identify filter summaries
+    fname = [os.path.basename(x) for x in infiles]
+    pattern = r".*(?=\.fastq)"
+    result = [m.group(0) for x in fname for m in [re.search(pattern, x)] if m]
+    summary_file = [x + "_summary.tsv" for x in result]
+
+    # initiate merged summary file
+    merged = open(outfile, "w")
+    merged.write("reads.in\treads.out\tsample\n")
+
+    # read one summary file at a time
+    for f in summary_file:
+        with open(os.path.join('filtered.dir', f), "r") as curr_file:
+            entry = curr_file.readlines()[1]
+            merged.write(entry)
+        curr_file.close()
+    merged.close()
+
+###################################################
+###################################################
+###################################################
+def mergeQCSummary(infiles, outfile):
+    '''
+    merge all qc summaries into one file
+    into merge_qc_summary.tsv)
+    '''
+    
+    # identify filter summaries
+    fname = [os.path.basename(x) for x in infiles]
+    
+    pattern = r".*(?=_seq_abundance.tsv)"
+    result = [m.group(0) for x in fname for m in [re.search(pattern, x)] if m]
+    summary_file = [x + "_summary.tsv" for x in result]
+    # initiate merged summary file
+    merged = open(outfile, "w")
+    merged.write("denoised\tnochim\tsample\n")
+
+    # read one summary file at a time
+    for f in summary_file:
+        with open(os.path.join('abundance.dir', f), "r") as curr_file:
+            entry = curr_file.readlines()[1]
+            merged.write(entry)
+        curr_file.close()
+    merged.close()
+
+#####################################################
+#####################################################
+#####################################################
+# save pipeline.yml file as dataframe (tsv)
+
+def yml2Table(param_dict, outfile):
+
+    # expand parameters dictionary so only one value per key
+    # keep record parameter sections
+    key_list = []
+    val_list = []
+    task_list = []
+    
+    for key in param_dict.keys():
         
+        curr_val = param_dict[key]
+
+        # if value is a dictionary, unpack dictionary values
+        if isinstance(curr_val, dict):
+            
+            for k in curr_val.keys():
+                v = curr_val[k]
+
+                # convert value to list of strings
+                ## when nested dict value is one value
+                ## immediately update output lists
+                if isinstance(v, list) == False:
+                    key_list.append(k)
+                    val_list.append(str(v))
+                    task_list.append(key)
+                ## when nested dict value is list
+                ## split up list so one value per key
+                else:
+                    for i, x in enumerate(v):
+                        entry_key = str(k) + str(i)
+                        key_list.append(entry_key)
+                        val_list.append(x)
+                        task_list.append(key)
+
+        # assuming only single values in non-dictionary values
+        # so can add directly to output lists
+        else:
+            key_list.append(str(key))
+            val_list.append(str(curr_val))
+            task_list.append(key)
+    
+    # record pipeline.yml into a table
+    yml_table = pd.DataFrame(list(zip(task_list, key_list, val_list)),
+                             columns = ["task", "parameter","value"])
+
+    # write table to file
+    yml_table.to_csv(outfile, index = False, sep = "\t")
+   
