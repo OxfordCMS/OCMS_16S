@@ -232,18 +232,17 @@ def mergeQCSummary(infiles, outfile):
 def yml2Table(param_dict, outfile):
 
     # expand parameters dictionary so only one value per key
+    # keep record parameter sections
     key_list = []
     val_list = []
+    task_list = []
+    
     for key in param_dict.keys():
 
         curr_val = param_dict[key]
 
         # if value is a dictionary, unpack dictionary values
         if isinstance(curr_val, dict):
-
-            # add dict header
-            key_list.append(key)
-            val_list.append('param section')
             
             for k in curr_val.keys():
                 v = curr_val[k]
@@ -254,6 +253,7 @@ def yml2Table(param_dict, outfile):
                 if isinstance(v, list) == False:
                     key_list.append(k)
                     val_list.append(str(v))
+                    task_list.append(key)
                 ## when nested dict value is list
                 ## split up list so one value per key
                 else:
@@ -261,16 +261,18 @@ def yml2Table(param_dict, outfile):
                         entry_key = str(k) + str(i)
                         key_list.append(entry_key)
                         val_list.append(x)
+                        task_list.append(key)
 
         # assuming only single values in non-dictionary values
         # so can add directly to output lists
         else:
             key_list.append(str(key))
             val_list.append(str(curr_val))
+            task_list.append(key)
     
     # record pipeline.yml into a table
-    yml_table = pd.DataFrame(list(zip(key_list, val_list)),
-                             columns = ['parameter','value'])
+    yml_table = pd.DataFrame(list(zip(task_list, key_list, val_list)),
+                             columns = ["task", "parameter","value"])
 
     # write table to file
     yml_table.to_csv(outfile, index = False, sep = "\t")
