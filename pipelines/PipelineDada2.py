@@ -240,6 +240,11 @@ def yml2Table(param_dict, outfile):
 
         # if value is a dictionary, unpack dictionary values
         if isinstance(curr_val, dict):
+
+            # add dict header
+            key_list.append(key)
+            val_list.append('param section')
+            
             for k in curr_val.keys():
                 v = curr_val[k]
 
