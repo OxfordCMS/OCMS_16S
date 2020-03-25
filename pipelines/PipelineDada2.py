@@ -238,7 +238,7 @@ def yml2Table(param_dict, outfile):
     task_list = []
     
     for key in param_dict.keys():
-
+        
         curr_val = param_dict[key]
 
         # if value is a dictionary, unpack dictionary values
