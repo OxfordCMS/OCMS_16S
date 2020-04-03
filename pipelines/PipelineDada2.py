@@ -212,9 +212,14 @@ def mergeQCSummary(infiles, outfile):
     pattern = r".*(?=_seq_abundance.tsv)"
     result = [m.group(0) for x in fname for m in [re.search(pattern, x)] if m]
     summary_file = [x + "_summary.tsv" for x in result]
+
+    # get header from first summary file
+    first_file = open(os.path.join("abundance.dir",
+                                   summary_file[0]),'r')
+    header = first_file.readline()
     # initiate merged summary file
     merged = open(outfile, "w")
-    merged.write("denoised\tnochim\tsample\n")
+    merged.write(header)
 
     # read one summary file at a time
     for f in summary_file:
