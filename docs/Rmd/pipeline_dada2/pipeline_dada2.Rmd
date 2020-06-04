@@ -25,7 +25,7 @@ knitr::opts_chunk$set(out.extra = '')
 knitr::opts_knit$set(root.dir = "../")
 ```
 
-# report_title
+# "YouSeq data INT001"
 
 
 ## Sample mapping
@@ -188,7 +188,13 @@ A useful metric is the number of ASVs that were called per sample even though we
 dat <- data.frame(fread("abundance.dir/taxa_abundances.tsv", header=TRUE, stringsAsFactors=F, sep="\t"))
 rownames(dat) <- dat$featureID
 dat <- dat[,2:ncol(dat)]
-colnames(dat) <- factor(sample.map[gsub("\\.", "-", colnames(dat)),]$reportId, levels=ids)
+new.colnames <- factor(sample.map[gsub("\\.", "-", colnames(dat)),]$reportId, levels=ids)
+
+# need to catch if the colnames are not usual
+if (is.na(new.colnames[1])){
+  new.colnames <- factor(levels(new.colnames), levels=levels(new.colnames))
+}
+colnames(dat) <- new.colnames
 
 nasvs <- data.frame(colSums(dat > 0))
 nasvs$sample <- factor(rownames(nasvs), levels=ids)
