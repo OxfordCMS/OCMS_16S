@@ -4,8 +4,7 @@
 # explicit here is helpful
 paired: 1
 
-scriptsdir: /gfs/devel/nilott/NGSKit/R
-
+# dada2 parameteres
 trim:
 
     # parameters used for trimming reads. If the data are
@@ -19,13 +18,15 @@ trim:
 
 sample_inference:
 
-    # paramters for sample inference. This includes
+    # parameters for sample inference. This includes
     # error learning, de-replication, merging (if paired) and
     # sample inference.
 
     # number of reads to use (per sample) to estimate error
     # model
     nbases: 10000000
+
+    # additional options
     options: ''
 
 taxonomy:
@@ -34,11 +35,18 @@ taxonomy:
 
     # assigning taxonomy
     taxonomy_file: /gfs/mirror/dada2/RefSeq-RDP16S_v2_May2018.fa.gz
+
+    # This is the file that is used for the addSpecies function in
+    # dada2 for exact matching and species assignment. It must therefore
+    # be derived from the same database used as taxonomy_file above
     species_file: /gfs/mirror/dada2/silva_species_assignment_v132.fa.gz
 
 report:
-    # whether to run diagnostics report. specify as 1 if you wish to run it
+    # whether to run diagnostics report. This is only necessary if after the
+    # main report is built you want to get into more regarding the specifics of
+    # how dada2 processed sequences. Specify as 1 if you wish to run it
     diagnostics:
-    directory: /gfs/devel/nilott/NGSKit/pipelines/docs/Rmd/pipeline_dada2
+
+    # author and name of the project for reporting purposes
     author: Nick Ilott
     title: Calprotectin project

@@ -170,6 +170,9 @@ import pipelines.PipelineDada2 as PipelineDada2
 P.initialize()
 PARAMS = P.get_params()
 
+# scripts directory - R scripts for dada2 functions
+scriptsdir = os.path.basename(__file__).replace("pipelines", "R")
+
 ###################################################
 ###################################################
 ###################################################
@@ -478,7 +481,7 @@ def build_report():
     '''
     render the rmarkdown report file
     '''
-    reportdir = PARAMS["report_directory"]
+    reportdir = os.path.basename(__file__).replace("pipelines", "docs/Rmd/pipeline_dada2")
     author = '"' + PARAMS["report_author"] + '"'
     title = '"' + PARAMS["report_title"] + '"'
 
@@ -502,17 +505,16 @@ def build_report():
     P.run(statement)
 
     # render the report
-    statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i report.Rmd; cd ../'''
+    statement = '''cd report.dir; R -e "rmarkdown::render(report.Rmd, output_file=report.html)"; cd ../'''
     P.run(statement)
 
     if PARAMS["report_diagnostics"] == 1:
         # render the diagnostic report
-        statement = '''cd report.dir; Rscript %(scriptsdir)s/render.R -i pipeline_dada2_diagnostics.Rmd; cd ../'''
+        statement = '''cd report.dir; R -e rmarkdown::render(pipeline_dada2_diagnostics.Rmd, output_file=pipeline_dada2_diagnostics.html); cd ../'''
         P.run(statement)
     else:
         E.info("Not running diagnostics report")
         
-    
 #########################################
 #########################################
 #########################################
