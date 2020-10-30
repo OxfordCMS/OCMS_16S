@@ -171,7 +171,7 @@ P.initialize()
 PARAMS = P.get_params()
 
 # scripts directory - R scripts for dada2 functions
-scriptsdir = os.path.basename(__file__).replace("pipelines", "R")
+scriptsdir = os.path.basename(pipeline_dada2.__file__).replace("pipelines", "R")
 
 ###################################################
 ###################################################
@@ -481,7 +481,7 @@ def build_report():
     '''
     render the rmarkdown report file
     '''
-    reportdir = os.path.basename(__file__).replace("pipelines", "docs/Rmd/pipeline_dada2")
+    reportdir = os.path.basename(pipeline_dada2.__file__).replace("pipelines", "docs/Rmd/pipeline_dada2")
     author = '"' + PARAMS["report_author"] + '"'
     title = '"' + PARAMS["report_title"] + '"'
 
