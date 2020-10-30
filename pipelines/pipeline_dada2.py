@@ -150,19 +150,8 @@ Code
 
 # load modules
 from ruffus import *
-
-try:
-    import CGAT.Experiment as E
-except ImportError:
-    print("CGAT module not available, using CGATCore instead")
-    import cgatcore.experiment as E
-
-try: 
-    import CGATPipelines.Pipeline as P
-except ImportError:
-    print("CGAT module not available, using CGATCore instead")
-    import cgatcore.pipeline as P
-    
+import cgatcore.experiment as E
+import cgatcore.pipeline as P
 import shutil
 import logging as L
 import os
@@ -177,11 +166,9 @@ import PipelineDada2 as PipelineDada2
 # Pipeline configuration
 ###################################################
 
-# load options from the config file
-P.get_parameters(
-    ["pipeline.yml"])
-
-PARAMS = P.PARAMS
+# Initialize the pipeline
+P.initialize()
+PARAMS = P.get_params()
 
 ###################################################
 ###################################################
