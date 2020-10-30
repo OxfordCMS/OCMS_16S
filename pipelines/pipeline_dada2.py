@@ -158,7 +158,7 @@ import os
 import sys
 import glob
 import re
-import PipelineDada2 as PipelineDada2
+import pipelines.PipelineDada2 as PipelineDada2
 
 ###################################################
 ###################################################
@@ -512,5 +512,8 @@ def build_report():
 #########################################
 #########################################
 #########################################
+def main(argv=None):
+    P.main(argv)
+
 if __name__ == "__main__":
     sys.exit(P.main(sys.argv))

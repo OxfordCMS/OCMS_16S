@@ -7,15 +7,15 @@ from setuptools import setup, find_packages
 
 setup(
     # package information
-    name='ocms 16S',
+    name='ocms_16S',
     version="0.0",
     description='ocms : Oxford Centre for Microbiome Studies apps',
     author='Nicholas Ilott, Sandi Yen, Jethro Johnson',
     license="MIT",
     platforms=["any"],
     keywords="microbiome, metagenomics, genomics",
-    packages=find_packages() + find_packages("./pipelines"),
+    packages=find_packages("./") + find_packages("./pipelines"),
     entry_points={
-        'console_scripts': ['ocms = ocms:main']
+        'console_scripts': ['ocms = pipelines.ocmsflow:main']
     }
 )
