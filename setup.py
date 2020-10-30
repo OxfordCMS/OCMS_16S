@@ -16,6 +16,6 @@ setup(
     keywords="microbiome, metagenomics, genomics",
     packages=find_packages("./") + find_packages("./pipelines"),
     entry_points={
-        'console_scripts': ['ocms = pipelines.ocmsflow:main']
+        'console_scripts': ['ocmsflow = pipelines.ocmsflow:main']
     }
 )
