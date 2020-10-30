@@ -171,7 +171,7 @@ P.initialize()
 PARAMS = P.get_params()
 
 # scripts directory - R scripts for dada2 functions
-rscriptsdir = os.path.dirname(PipelineDada2.__file__).replace("pipelines", "R")
+PARAMS["rscriptsdir"] = os.path.dirname(PipelineDada2.__file__).replace("pipelines", "R")
 
 ###################################################
 ###################################################
