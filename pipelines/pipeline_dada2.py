@@ -238,7 +238,7 @@ def filterAndTrim(infile, outfile):
                            --trimLeft=%(trimLeft)s
                            --filtered-directory=filtered.dir'''
     P.run(statement)
-    summary = open(outfile.replace(".fastq.1.gz" + "_summary.tsv")).readline()
+    summary = open(outfile.replace(".fastq.1.gz",  "_summary.tsv")).readline()
     summary = summary.readline().split("\t")
     assert int(summary[1]) != 0, f"Filtered file {outfile} has no reads - try re-running with different filtering parameters"
         
