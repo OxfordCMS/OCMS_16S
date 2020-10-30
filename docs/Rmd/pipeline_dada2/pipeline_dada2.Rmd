@@ -28,27 +28,6 @@ knitr::opts_knit$set(root.dir = "../")
 # "YouSeq data INT001"
 
 
-## Sample mapping
-
-When there are lots of samples with complicated sample names the rendering of this document is
-suboptimal. To mitigate unwanted visual effects (somewhat) we map each sample to a unique number
-that is plotted on each graph - the map is below for linking what you see in the plots to the
-sample names.
-
-```{r samplemap, echo=FALSE}
-
-library(knitr)
-samples <- list.files(pattern="*.fastq.1.gz")
-samples <- gsub(".fastq.1.gz", "", samples)
-
-ids <- seq(1, length(samples),1)
-sample.map <- data.frame(sample=samples, reportId=ids)
-rownames(sample.map) <- sample.map$sample
-
-kable(sample.map, row.names=FALSE)
-
-```
-
 ## dada2 filtering reads
 
 The first stage of the dada2 pipeline is filtering and trimming of reads. The number of reads
@@ -59,6 +38,7 @@ reads if there is an N in the sequence.
 
 ```{r include=FALSE, echo=FALSE}
 library(ggplot2)
+library(plotly)
 library(gridExtra)
 library(dplyr)
 library(reshape)
@@ -92,8 +72,6 @@ for (i in 1:length(infiles)){
 }
 names(dfs) <- names.list
 df <- bind_rows(dfs)
-x <- sample.map[df$sample,]$reportId
-df$sample <- factor(x, levels=ids)
 
 ################################################
 # define reads.in as the difference between the
@@ -110,7 +88,7 @@ p1 <- ggplot(df.m, aes(x=reorder(sample, as.numeric(sample)), y=value, fill=vari
 p2 <- p1 + geom_bar(stat="identity")
 p3 <- p2 + scale_fill_manual(values=c("red4", "blue4"))
 p4 <- p3 + theme_bw() + theme(axis.text.x=element_text(angle=90)) + xlab("sample") + ylab("Number of reads")
-p4
+ggplotly(p=p4)
 
 ```
 
@@ -164,8 +142,6 @@ for (i in 1:length(infiles)){
 }
 names(dfs) <- names.list
 df <- bind_rows(dfs)
-x <- sample.map[df$sample,]$reportId
-df$sample <- factor(x, levels=ids)
 
 # reshape and plot
 df.m <- melt(df)
@@ -174,7 +150,7 @@ p1 <- ggplot(df.m, aes(x=reorder(sample, as.numeric(sample)), y=value))
 p2 <- p1 + geom_bar(stat="identity")
 p3 <- p2 + theme_bw() + theme(axis.text.x=element_text(angle=90)) + xlab("sample") + ylab("Number of reads")
 p4 <- p3 + facet_wrap(~variable)
-p4
+ggplotly(p=p4)
 
 ```
 
@@ -188,16 +164,9 @@ A useful metric is the number of ASVs that were called per sample even though we
 dat <- data.frame(fread("abundance.dir/taxa_abundances.tsv", header=TRUE, stringsAsFactors=F, sep="\t"))
 rownames(dat) <- dat$featureID
 dat <- dat[,2:ncol(dat)]
-new.colnames <- factor(sample.map[gsub("\\.", "-", colnames(dat)),]$reportId, levels=ids)
-
-# need to catch if the colnames are not usual
-if (is.na(new.colnames[1])){
-  new.colnames <- factor(levels(new.colnames), levels=levels(new.colnames))
-}
-colnames(dat) <- new.colnames
 
 nasvs <- data.frame(colSums(dat > 0))
-nasvs$sample <- factor(rownames(nasvs), levels=ids)
+nasvs$sample <- factor(rownames(nasvs), levels=unique(rownames(nasvs)))
 nasvs.m <- melt(nasvs)
 
 # number of ASVs
@@ -206,7 +175,7 @@ p2 <- p1 + geom_bar(stat="identity")
 p3 <- p2 + theme_bw()
 p4 <- p3 + theme(axis.text.x=element_text(angle=90))
 p5 <- p4 + ylab("number of ASVs")
-p5
+ggplotly(p5)
 ```
 
 ```{r prevalence, fig.height=4, fig.width=10, echo=FALSE, message=FALSE}
@@ -268,7 +237,7 @@ p8 <- p7 + geom_point()
 p9 <- p8 + theme_bw()
 p10 <- p9 + xlab("Mean relative abundance") + ylab("Prevalence (%)")
 
-grid.arrange(p6, p10, nrow=1, ncol=2)
+subplot(ggplotly(p=p6), ggplotly(p=p10), nrows=1)
 
 ```
 
@@ -298,7 +267,7 @@ plotBar <- function(x){
 
 # plot phylum level distributions
 p11 <- plotBar(dp)
-p11
+ggplotly(p11)
 ```
 
 ```{r nreads.in.taxa, fig.height=4, fig.width=5, echo=FALSE, message=FALSE}
@@ -329,7 +298,7 @@ p13 <- p12 + geom_bar(stat="identity")
 p14 <- p13 + theme_bw() 
 p15 <- p14 + ylab("% assigned") + xlab("Taxonomic levels")
 p16 <- p15 + scale_fill_manual(values=c("red3", "blue3", "green3", "orange3", "purple3", "grey", "black"))
-p16
+ggplotly(p16)
 ```
 
 
