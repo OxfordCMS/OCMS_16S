@@ -1,0 +1,36 @@
+---
+header-includes:
+- \usepackage{placeins}
+- \usepackage{float}
+- \floatplacement{figure}{H}
+
+output:
+  html_document:
+    df_print: paged
+urlcolor: blue
+---
+
+\begin{centering}
+\vspace{3 cm}
+
+\Large
+`r toString(report_title)`
+
+\normalsize
+Analysis report, `r format(Sys.time(), "%b %d %Y")`
+
+`r toString(report_author)`
+
+\vspace{3 cm}
+\end{centering}
+
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+\newpage
+
+```{r child = 'pipeline_dada2.Rmd'}
+```
+
+
+

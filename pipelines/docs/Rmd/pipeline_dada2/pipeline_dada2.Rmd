@@ -1,0 +1,222 @@
+---
+title: "dada2 analysis"
+header-includes: #allows you to add in your own Latex packages
+- \usepackage{float} #use the 'float' package
+- \floatplacement{figure}{H} #make every figure with caption = h
+
+output:
+  pdf_document:
+    fig_caption: true
+    keep_tex: true
+    latex_engine: pdflatex
+  html_document:
+    df_print: paged
+urlcolor: blue
+
+graphics: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.extra = '')
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_knit$set(root.dir = "../")
+```
+
+# report_title
+
+
+## Sample mapping
+
+When there are lots of samples with complicated samplenames the rendering of this document is
+suboptimal. To mitigate unwanted visual effects (somewhat) we map each sample to a unique number
+that is plotted on each graph - the map is below for linking what you see in the plots to the
+sample names.
+
+```{r samplemap, echo=FALSE}
+
+library(knitr)
+samples <- list.files(pattern="*.fastq.1.gz")
+samples <- gsub(".fastq.1.gz", "", samples)
+
+ids <- as.character(seq(1, length(samples),1))
+sample.map <- data.frame(sample=samples, reportId=ids)
+rownames(sample.map) <- as.character(sample.map$sample)
+
+kable(sample.map, row.names=FALSE)
+
+```
+
+## dada2 filtering reads
+
+The first stage of the dada2 pipeline is filtering and trimming of reads. The number of reads
+that remain for downstream analysis is dependent on the parameters that were set for filtering
+and trimming. In most cases it would be expected that the vast majority of reads will remain
+after this step. It is noteworthy that dada2 does not accept any "N" bases and so will remove
+reads if there is an N in the sequence.
+
+```{r include=FALSE, echo=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(reshape)
+library(gplots)
+```
+
+### Number of reads input/output during filtering and trimming
+
+Below is a summary of the number of input reads and the number of output reads for each sample.
+
+```{r filtering, fig.cap='Number of input and output reads during filtering step', fig.height=5, fig.width=10,  echo=FALSE, message=FALSE}
+
+#########################
+# read relevant infiles
+#########################
+
+infiles = list.files(path="filtered.dir", pattern = "*summary.tsv")
+
+###########################################
+# create dataframe from all summary tables
+###########################################
+
+dfs <- list()
+names.list <- c()
+for (i in 1:length(infiles)){
+    infile <- paste("filtered.dir", infiles[i], sep="/")
+    df <- read.csv(infile, header=T, stringsAsFactors=F, sep="\t")
+    dfs[[i]] <- df
+    names.list <- append(basename(infile), names.list)
+}
+names(dfs) <- names.list
+df <- bind_rows(dfs)
+x <- sample.map[df$sample,]$reportId
+df$sample <- x
+
+################################################
+# define reads.in as the difference between the
+# starting number and the finishing number. This
+# enables visualisation in a stacked bar chart
+################################################
+
+df$reads.in <- df$reads.in - df$reads.out
+
+# reshape and plot
+df.m <- melt(df)
+
+p1 <- ggplot(df.m, aes(x=sample, y=value, fill=variable))
+p2 <- p1 + geom_bar(stat="identity")
+p3 <- p2 + scale_fill_manual(values=c("red4", "blue4"))
+p4 <- p3 + theme_bw() + theme(axis.text.x=element_text(angle=90))
+p4
+
+```
+
+## Learning the error model
+
+Dada2 performs a step where it learns the sequencing error model. Taken from the tutorial:
+
+The DADA2 algorithm makes use of a parametric error model (err) and every amplicon dataset has a different set of error rates.
+The learnErrors method learns this error model from the data, by alternating estimation of the error rates and inference of sample
+composition until they converge on a jointly consistent solution. As in many machine-learning problems, the algorithm must begin
+with an initial guess, for which the maximum possible error rates in this data are used (the error rates if only the most abundant
+sequence is correct and all the rest are errors).
+
+In contrast to the dada2 tutorial [here](https://benjjneb.github.io/dada2/tutorial.html), and for the purposes of parallelisation,
+we learn the error model using each sample separately. It should be noted that this may not be ideal in all situtations but it does
+speed up data processing. This also means that we produce a plot for each sample separately. It is not feasible to display them
+all here and so we just inspect one for the report purposes but all others are available where the piepline was run. Note that
+at the moment this is restricted to the forward reads (so there is no error thrown when using single end data).
+
+
+![Error model](errF.png)
+
+## De-replication, sample inference, merging and chimera removal
+
+The next stage of the dada2 pipeline involves dereplication, sample inference, merging (if paired-end) and chimera removal.
+Again from the tutorial, dereplication combines all identical sequencing reads into into “unique sequences” with a corresponding
+“abundance” equal to the number of reads with that unique sequence. These are then taken forward into the sample inference stage
+and chimera removal. It is useful to see after this has been done how many sequences we are left with. The majority of reads
+should contribute to the final overall counts.
+
+
+```{r sample-inference, fig.cap='Number of input and output reads during filtering step', fig.height=10, fig.width=10,  echo=FALSE, message=FALSE}
+
+#########################
+# read relevant infiles
+#########################
+
+infiles = list.files(path="abundance.dir", pattern = "*summary.tsv")
+
+###########################################
+# create dataframe from all summary tables
+###########################################
+
+dfs <- list()
+names.list <- c()
+for (i in 1:length(infiles)){
+    infile <- paste("abundance.dir", infiles[i], sep="/")
+    df <- read.csv(infile, header=T, stringsAsFactors=F, sep="\t")
+    dfs[[i]] <- df
+    names.list <- append(basename(infile), names.list)
+}
+names(dfs) <- names.list
+df <- bind_rows(dfs)
+x <- sample.map[df$sample,]$reportId
+df$sample <- x
+
+# reshape and plot
+df.m <- melt(df)
+
+p1 <- ggplot(df.m, aes(x=sample, y=value))
+p2 <- p1 + geom_bar(stat="identity")
+p3 <- p2 + theme_bw() + theme(axis.text.x=element_text(angle=90))
+p4 <- p3 + facet_wrap(~variable)
+p4
+
+```
+
+## Taxonomic assignment
+
+The next stage is to assign each of the amplicon sequence variants (ASV) to a taxonomic group. Below is a description of the number of ASVs that
+were identified in each sample and the taxonomic groups found among them.
+
+
+```{r taxonomy, fig.cap='Taxonomic assignments of ASVs', fig.height=5, fig.width=12,  echo=FALSE, message=FALSE}
+
+dat <- read.csv("abundance.dir/taxa_abundances.tsv", header=T, stringsAsFactors=F, sep="\t", row.names=1)
+colnames(dat) <- sample.map[gsub("\\.", "-", colnames(dat)),]$reportId
+
+nasvs <- data.frame(colSums(dat > 0))
+nasvs$sample <- rownames(nasvs)
+nasvs.m <- melt(nasvs)
+
+# number of ASVs
+p1 <- ggplot(nasvs.m, aes(x=sample, y=value))
+p2 <- p1 + geom_bar(stat="identity")
+p3 <- p2 + theme_bw()
+p4 <- p3 + theme(axis.text.x=element_text(angle=90))
+p5 <- p4 + ylab("number of ASVs")
+
+# taxonomic distributions
+# combine at different levels down to genus
+
+p <- gsub(";c__.*", "", rownames(dat))
+p <- gsub("ASV[0-9]*:", "", p)
+dp <- melt(aggregate(dat, list(p), sum))
+
+plotBar <- function(x){
+	p1 <- ggplot(x, aes(x=variable, y=value, fill=Group.1))
+	p2 <- p1 + geom_bar(position="fill", stat="identity")
+	p3 <- p2 + scale_y_continuous(labels = scales::percent)
+	p4 <- p3 + theme_bw()
+	p5 <- p4 + theme(axis.text.x=element_text(angle=90))
+	return(p5)
+	}
+
+p6 <- plotBar(dp)
+
+grid.arrange(p5,p6, ncol=2, nrow=1)
+
+```

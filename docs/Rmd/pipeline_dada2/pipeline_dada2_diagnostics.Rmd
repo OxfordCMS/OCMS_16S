@@ -1,0 +1,91 @@
+---
+title: "diagnostics"
+header-includes: #allows you to add in your own Latex packages
+- \usepackage{float} #use the 'float' package
+- \floatplacement{figure}{H} #make every figure with caption = h
+
+output:
+  pdf_document:
+    fig_caption: true
+    keep_tex: true
+    latex_engine: pdflatex
+  html_document:
+    df_print: paged
+urlcolor: blue
+
+graphics: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.extra = '')
+#knitr::opts_chunk$set(fig.pos = 'H')
+knitr::opts_knit$set(root.dir = "../abundance.dir")
+```
+
+# Error models
+
+Although we output a representative error model plot in the main report, here we produce one per sample.
+
+```{r error.model, results = 'asis'}
+plots <- list.files(pattern="../filtered.dir/*.png")
+for(i in plots){
+    filename <- file.path("plot", i)
+    cat("![text](",filename,")")
+}
+```
+
+# Dada2 diagnostics
+
+Dada2 outputs some useful diagnostics metrics for ASVs that are included in the clustering data frame. Here we plot these
+for each sample in order to provide some way of determining how good the ASV calls are. The columns that we use are:
+
+* (n0 + n1)/abundance - This provides the abundance of exact matching and one-away matches per partition (2-columns for paired data)
+* birth_pval - p-value associated with the confidence in creating a new partition
+* birth_ham - hamming distance of new partition from partition that it was separated from
+* birth_qave - average quality score of variants that separate this partition from the partition that it separated from
+
+
+```{r diagnostics, fig.cap='Diagnostic plots', fig.height=5, fig.width=10,  echo=FALSE, message=FALSE}
+
+library(GGally)
+library(gridExtra)
+infiles <- list.files(pattern="*_clustering.tsv")
+
+grob.list = list()
+for (i in 1:length(infiles)){
+    dat <- read.csv(infiles[i], header=T, stringsAsFactors=F, sep="\t", row.names=1)
+    if ("F.n0" %in% colnames(dat)){
+        paired=TRUE}
+    else{
+        paired=FALSE}
+    if (paired==FALSE){
+        d <- data.frame(fone.away=(dat$n0 + dat$n1)/dat$abundance,
+	                birth_pval=-log10(dat$birth_pval),
+			birth_ham=dat$birth_ham,
+			birth_qave=dat$birth_qave)
+        print(ggpairs(d) + theme_bw() + ggtitle(infiles[i]))
+        
+    }
+    else{
+        F.d <- data.frame(F.fone.away=(dat$F.n0 + dat$F.n1)/dat$F.abundance,
+	                F.birth_pval=-log10(dat$F.birth_pval),
+			F.birth_ham=dat$F.birth_ham,
+			F.birth_qave=dat$F.birth_qave)
+        R.d <- data.frame(R.fone.away=(dat$R.n0 + dat$R.n1)/dat$R.abundance,
+	                R.birth_pval=-log10(dat$R.birth_pval),
+			R.birth_ham=dat$R.birth_ham,
+			R.birth_qave=dat$R.birth_qave)
+        print(ggpairs(F.d) + theme_bw() + ggtitle(infiles[i]))
+        print(ggpairs(R.d) + theme_bw() + ggtitle(infiles[i]))
+    }
+}
+
+	
+
+```
+
+
+
