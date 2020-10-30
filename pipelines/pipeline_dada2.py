@@ -171,7 +171,7 @@ P.initialize()
 PARAMS = P.get_params()
 
 # scripts directory - R scripts for dada2 functions
-scriptsdir = os.path.dirname(PipelineDada2.__file__).replace("pipelines", "R")
+rscriptsdir = os.path.dirname(PipelineDada2.__file__).replace("pipelines", "R")
 
 ###################################################
 ###################################################
@@ -228,7 +228,7 @@ def filterAndTrim(infile, outfile):
 
     # hackabout
     outtmp = os.path.join(tmpdir, [x for x in infiles if x.endswith(".fastq.1.gz")][0].replace(".gz", ""))
-    statement = '''Rscript %(scriptsdir)s/dada2_filter_and_trim.R
+    statement = '''Rscript %(rscriptsdir)s/dada2_filter_and_trim.R
                            --infile=%(outtmp)s
                            %(paired)s
                            --maxN=%(maxn)s
@@ -268,14 +268,14 @@ def runSampleInference(infile, outfile):
         infile_read2 = infile.replace(".fastq.1.gz", ".fastq.2.gz")
 
         # generate statement to execute
-        statement = '''Rscript %(scriptsdir)s/dada2_sample_inference.R
+        statement = '''Rscript %(rscriptsdir)s/dada2_sample_inference.R
                        --filtF=%(infile)s
                        --filtR=%(infile_read2)s
                        --nbases=%(nbases)s
                        %(options)s
                        --outdir=%(outdir)s'''
     else:
-        statement = '''Rscript %(scriptsdir)s/dada2_sample_inference.R
+        statement = '''Rscript %(rscriptsdir)s/dada2_sample_inference.R
                        --filtF=%(infile)s
                        --nbases=%(nbases)s
                        %(options)s
@@ -318,7 +318,7 @@ def assignTaxonomy(infile, outfile):
     taxonomy_file = PARAMS["taxonomy_taxonomy_file"]
     species_file = PARAMS["taxonomy_species_file"]
 
-    statement = '''Rscript %(scriptsdir)s/dada2_assign_taxonomy.R
+    statement = '''Rscript %(rscriptsdir)s/dada2_assign_taxonomy.R
                    --seqfile=%(infile)s
                    --training-set=%(taxonomy_file)s
                    --species-file=%(species_file)s
@@ -389,7 +389,7 @@ def splitTableByTaxonomicLevels(infile, outfiles):
     split the table at different taxonomic levels and
     sum counts for each member of that level
     '''
-    statement = '''Rscript %(scriptsdir)s/dada2_split_levels.R
+    statement = '''Rscript %(rscriptsdir)s/dada2_split_levels.R
                    --outdir=taxonomy_abundances.dir
                    -i %(infile)s
                 ''' 
