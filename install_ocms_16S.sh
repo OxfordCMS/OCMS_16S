@@ -9,7 +9,6 @@ conda install -c r r-ggplot2 \
       r-gplots \
       r-data.table \
       r-optparse \
-      r-cppparallel
 
 echo "installing bioconda packages"
 conda install -c bioconda r-rcppparallel bioconductor-dada2 cgat-core
