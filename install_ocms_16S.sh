@@ -12,7 +12,7 @@ conda install -c r r-ggplot2 \
       r-cppparallel
 
 echo "installing bioconda packages"
-conda install -c bioconda r-cppparallel bioconductor-dada2 cgat-core
+conda install -c bioconda r-rcppparallel bioconductor-dada2 cgat-core
 
 echo "installing OCMS 16S"
 python setup.py install
