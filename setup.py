@@ -18,6 +18,8 @@ setup(
     packages=find_packages("./") + find_packages("./pipelines"),
     entry_points={
         'console_scripts': ['ocmsflow = ocms_16S.ocmsflow:main']
-    }
+    },
+    include_package_data=True,
+    python_requires='>=3.6.0'                                            
 )
 
