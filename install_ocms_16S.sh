@@ -3,7 +3,7 @@
 echo "installing R dependencies"
 conda install -c r r-ggplot2 \
       r-plotly \
-      r-gridextrar \
+      r-gridextra \
       r-dplyr \
       r-reshape \
       r-gplots \
@@ -11,11 +11,8 @@ conda install -c r r-ggplot2 \
       r-optparse \
       r-cppparallel
 
-echo "installing dada2"
-conda install -c bioconda bioconductor-dada2
-
-echo "installing cgat-core"
-conda install -c bioconda cgat-core
+echo "installing bioconda packages"
+conda install -c bioconda r-cppparallel bioconductor-dada2 cgat-core
 
 echo "installing OCMS 16S"
 python setup.py install
