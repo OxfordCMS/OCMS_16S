@@ -10,7 +10,6 @@ import re
 import glob
 import imp
 import cgatcore.iotools as iotools
-import cgat
 
 
 def main(argv=None):
