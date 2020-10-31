@@ -158,7 +158,7 @@ import os
 import sys
 import glob
 import re
-import pipelines.PipelineDada2 as PipelineDada2
+import ocms_16S.PipelineDada2 as PipelineDada2
 
 ###################################################
 ###################################################
@@ -171,7 +171,7 @@ P.initialize()
 PARAMS = P.get_params()
 
 # scripts directory - R scripts for dada2 functions
-PARAMS["rscriptsdir"] = os.path.dirname(PipelineDada2.__file__).replace("pipelines", "R")
+PARAMS["rscriptsdir"] = os.path.dirname(PipelineDada2.__file__).replace("ocms_16S", "R")
 
 ###################################################
 ###################################################
@@ -482,7 +482,7 @@ def build_report():
     '''
     render the rmarkdown report file
     '''
-    reportdir = os.path.dirname(PipelineDada2.__file__).replace("pipelines", "docs/Rmd/pipeline_dada2")
+    reportdir = os.path.dirname(PipelineDada2.__file__).replace("ocms_16S", "docs/Rmd/pipeline_dada2")
     author = '"' + PARAMS["report_author"] + '"'
     title = '"' + PARAMS["report_title"] + '"'
 
