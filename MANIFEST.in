@@ -1,0 +1,2 @@
+include R/*.R
+include ocms_16S/pipeline_dada2/pipeline.yml
