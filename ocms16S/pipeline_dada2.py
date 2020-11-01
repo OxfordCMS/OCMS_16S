@@ -511,7 +511,7 @@ def build_report():
 
     if PARAMS["report_diagnostics"] == 1:
         # render the diagnostic report
-        statement = '''cd report.dir; R -e rmarkdown::render(pipeline_dada2_diagnostics.Rmd, output_file=pipeline_dada2_diagnostics.html); cd ../'''
+        statement = '''cd report.dir; R -e rmarkdown::render('pipeline_dada2_diagnostics.Rmd', output_file='pipeline_dada2_diagnostics.html'); cd ../'''
         P.run(statement)
     else:
         E.info("Not running diagnostics report")
