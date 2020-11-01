@@ -506,7 +506,7 @@ def build_report():
     P.run(statement)
 
     # render the report
-    statement = '''cd report.dir; R -e "rmarkdown::render(report.Rmd, output_file=report.html)"; cd ../'''
+    statement = '''cd report.dir; R -e "rmarkdown::render('report.Rmd', output_file='report.html')"; cd ../'''
     P.run(statement)
 
     if PARAMS["report_diagnostics"] == 1:
