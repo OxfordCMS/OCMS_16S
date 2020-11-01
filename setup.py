@@ -17,7 +17,7 @@ setup(
     url="https://github.com/OxfordCMS/OCMS_16S",
     packages=find_packages("./") + find_packages("./pipelines"),
     entry_points={
-        'console_scripts': ['ocmsflow = ocms16S.ocmsflow:main']
+        'console_scripts': ['ocmsflow = ocms16S.ocms_16s:main']
     },
     include_package_data=True,
     python_requires='>=3.6.0'                                            
