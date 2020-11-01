@@ -482,7 +482,7 @@ def build_report():
     '''
     render the rmarkdown report file
     '''
-    reportdir = os.path.dirname(PipelineDada2.__file__).replace("ocms16S", "docs/Rmd/pipeline_dada2")
+    reportdir = os.path.join(os.path.dirname(PipelineDada2.__file__), "pipeline_docs/Rmd")
     author = '"' + PARAMS["report_author"] + '"'
     title = '"' + PARAMS["report_title"] + '"'
 
