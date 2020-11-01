@@ -457,7 +457,7 @@ def yml2Table(outfile):
 @transform([addUniqueIdentifiers, mergeTaxonomyTables,
             mergeFilterSummary, mergeQCSummary, yml2Table],
            regex(r"(.*)\.tsv"), r"\1.load")
-def build_db(infiles, outfile):
+def build_db(infile, outfile):
     '''
     Stores data generated throughout pipeline as a sqlite database.
     Structure of data tables and database is meant for compatibility
@@ -467,12 +467,14 @@ def build_db(infiles, outfile):
     # record merged_filter_summary, merged_qc_summary,
     # merged_taxonomy, merged_abundance_id
     # and yml table in database
-    P.load(infiles, outfile)
+    P.load(infile, outfile)
 
-    # add index to each table
-    # statement = '''sqlite3 csvdb; CREATE UNIQUE INDEX merged_taxonomy ON merged_abundance (sequence); .quit'''
-    # P.run(statement)
-
+    # move database to specified name
+    db_name = PARAMS["database_name"]
+    if db_name:
+        statement = '''mv csvdb %(db_name)s'''
+        P.run(statement)
+    
 #########################################
 #########################################
 #########################################

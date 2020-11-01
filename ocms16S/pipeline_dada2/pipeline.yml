@@ -4,7 +4,7 @@
 # explicit here is helpful
 paired: 1
 
-# dada2 parameteres
+# dada2 parameters
 trim:
 
     # parameters used for trimming reads. If the data are
@@ -49,4 +49,9 @@ report:
 
     # author and name of the project for reporting purposes
     author: Nick Ilott
-    title: Calprotectin project
+    title: Title 
+
+database:
+    # name of the output database. This is a database that is built to
+    # be compatible with the OCMSExplorer.
+    name: output_db
