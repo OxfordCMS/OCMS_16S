@@ -1,5 +1,5 @@
 '''
-=======================================================
+1;95;0c=======================================================
 run dada2 amplicon sequencing analysis
 =======================================================
 
@@ -467,14 +467,9 @@ def build_db(infile, outfile):
     # record merged_filter_summary, merged_qc_summary,
     # merged_taxonomy, merged_abundance_id
     # and yml table in database
-    P.load(infile, outfile)
-
-    # move database to specified name
     db_name = PARAMS["database_name"]
-    if db_name:
-        statement = '''mv csvdb %(db_name)s'''
-        P.run(statement)
-    
+    P.load(infile, outfile, options=f'--database-url={db_name}')
+
 #########################################
 #########################################
 #########################################
