@@ -468,7 +468,7 @@ def build_db(infile, outfile):
     # merged_taxonomy, merged_abundance_id
     # and yml table in database
     db_name = PARAMS["database_name"]
-    P.load(infile, outfile, options=f'--database-url={db_name}')
+    P.load(infile, outfile, options=f'--database-url=sqlite:///./{db_name}')
 
 #########################################
 #########################################
