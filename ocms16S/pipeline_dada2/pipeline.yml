@@ -2,7 +2,7 @@
 # specify whether data are paired or single end. The
 # pipeline will pick up whether this is true but being
 # explicit here is helpful
-paired: 1
+paired:
 
 # dada2 parameters
 trim:
