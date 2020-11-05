@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ocms_16s dada2 - amplicon sequencing analysis &#8212; OCMS_16S dada2 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="ocms-16s-dada2-amplicon-sequencing-analysis">
+<h1>ocms_16s dada2 - amplicon sequencing analysis<a class="headerlink" href="#ocms-16s-dada2-amplicon-sequencing-analysis" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Nick Ilott, Sandi Yen</p>
+</dd>
+<dt class="field-even">Release</dt>
+<dd class="field-even"><p>$Id$</p>
+</dd>
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Nov 05, 2020</p>
+</dd>
+<dt class="field-even">Tags</dt>
+<dd class="field-even"><p>Python</p>
+</dd>
+</dl>
+<div class="section" id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Permalink to this headline">¶</a></h2>
+<p>This is a pipeline that is built using the <a class="reference external" href="https://github.com/cgat-developers/cgat-core">cgat-core</a> framework. The purpose of the pipeline is to run dada2 processing of amplicon sequencing data either on a compute cluster or locally. The pipeline consists of a number of wrapper scripts in R that are executed on the commandline and as such there is no requirement for R coding by the user. The hope is that the pipeline provides an accessible and user-friendly interface to produce reproducble results from an amplicon sequencing study.</p>
+<p>You should familiarise yourself with the <a class="reference external" href="https://benjjneb.github.io/dada2/tutorial.html">dada2</a> workflow before running the pipeline to ensure that you understand the parameterisation.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The pipeline depends on having a number of python and R libraries installed. The easiest way at the moment to ensure that you have an environment that is compatible with our dada2 pipeline is to create a conda environment that has all of the relevant dependencies installed. The following steps outline how to install our dada2 pipeline.</p>
+<ol class="arabic simple">
+<li><p>Download and install <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">conda</a> if you don’t already have it.</p></li>
+</ol>
+<ol class="arabic" start="2">
+<li><p>Clone the OCMS_16S repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">OxfordCMS</span><span class="o">/</span><span class="n">OCMS_16S</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</li>
+<li><p>Change into OCMS_16S directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">OCMS_16S</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create ocms_16s conda environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">envs</span><span class="o">/</span><span class="n">environment_ocms_16s</span><span class="o">.</span><span class="n">yaml</span>
+</pre></div>
+</div>
+</li>
+<li><p>Activate the newly created environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">ocms_16s</span>
+</pre></div>
+</div>
+</li>
+<li><p>Install ocms_16s dada2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">install</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Now you are ready to go!</p>
+</div>
+<div class="section" id="running-the-pipeline">
+<h2>Running the pipeline<a class="headerlink" href="#running-the-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>The pipeline runs using fastq files as input. It also requires parameters to be set that will be passed to the dada2 R scripts.</p>
+<div class="section" id="input-files">
+<h3>Input files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h3>
+<p>The input is a directory of fastq formatted files. These should be placed in the directory in which you wish to run the pipeline. They must be of the format &lt;name&gt;.fastq.1.gz for single-end data and two files &lt;name&gt;.fastq.1.gz and &lt;name&gt;.fastq.2.gz for paired-end data.</p>
+<p>For the pipeline to run succesfully you will also need to have downloaded relevant <a class="reference external" href="https://benjjneb.github.io/dada2/training.html">dada2 databases</a> and point to them in the pipeline.yml parameters file as described in the next section.</p>
+</div>
+<div class="section" id="parameterisation">
+<h3>Parameterisation<a class="headerlink" href="#parameterisation" title="Permalink to this headline">¶</a></h3>
+<p>The parameters for dada2 processing are specified in the pipeline.yml file. To create this file, move into the directory containing the fastq files that you wish to process and type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ocms_16s</span> <span class="n">dada2</span> <span class="n">config</span>
+</pre></div>
+</div>
+<p>This will create the pipeline.yml file in the current working directory which you can edit using your favourite text editor. The parameters are provided in a standard yaml format as outlined below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># specify whether data are paired or single end. The</span>
+<span class="c1"># pipeline will pick up whether this is true but being</span>
+<span class="c1"># explicit here is helpful</span>
+<span class="n">paired</span><span class="p">:</span>
+
+<span class="c1"># dada2 parameters</span>
+<span class="n">trim</span><span class="p">:</span>
+
+    <span class="c1"># parameters used for trimming reads. If the data are</span>
+    <span class="c1"># paired-end then you need to specify 2 values for</span>
+    <span class="c1"># maxee, truncLen and trimLeft. These parameters must be specified</span>
+    <span class="n">maxn</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="n">maxee</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span><span class="mi">2</span>
+    <span class="n">truncq</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="n">trunclen</span><span class="p">:</span> <span class="mi">250</span><span class="p">,</span><span class="mi">160</span>
+    <span class="n">trimleft</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span><span class="mi">0</span>
+
+<span class="n">sample_inference</span><span class="p">:</span>
+
+    <span class="c1"># parameters for sample inference. This includes</span>
+    <span class="c1"># error learning, de-replication, merging (if paired) and</span>
+    <span class="c1"># sample inference.</span>
+
+    <span class="c1"># number of reads to use (per sample) to estimate error</span>
+    <span class="c1"># model</span>
+    <span class="n">nbases</span><span class="p">:</span> <span class="mi">10000000</span>
+
+    <span class="c1"># additional options</span>
+    <span class="n">options</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
+
+<span class="n">taxonomy</span><span class="p">:</span>
+
+    <span class="n">memory</span><span class="p">:</span> <span class="mi">10</span><span class="n">G</span>
+
+    <span class="c1"># assigning taxonomy</span>
+    <span class="n">taxonomy_file</span><span class="p">:</span> <span class="o">/</span><span class="n">gfs</span><span class="o">/</span><span class="n">mirror</span><span class="o">/</span><span class="n">dada2</span><span class="o">/</span><span class="n">RefSeq</span><span class="o">-</span><span class="n">RDP16S_v2_May2018</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">gz</span>
+
+    <span class="c1"># This is the file that is used for the addSpecies function in</span>
+    <span class="c1"># dada2 for exact matching and species assignment. It must therefore</span>
+    <span class="c1"># be derived from the same database used as taxonomy_file above</span>
+    <span class="n">species_file</span><span class="p">:</span> <span class="o">/</span><span class="n">gfs</span><span class="o">/</span><span class="n">mirror</span><span class="o">/</span><span class="n">dada2</span><span class="o">/</span><span class="n">silva_species_assignment_v132</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">gz</span>
+
+<span class="n">report</span><span class="p">:</span>
+    <span class="c1"># whether to run diagnostics report. This is only necessary if after the</span>
+    <span class="c1"># main report is built you want to get into more regarding the specifics of</span>
+    <span class="c1"># how dada2 processed sequences. Specify as 1 if you wish to run it</span>
+    <span class="n">diagnostics</span><span class="p">:</span>
+
+    <span class="c1"># author and name of the project for reporting purposes</span>
+    <span class="n">author</span><span class="p">:</span> <span class="n">Nick</span> <span class="n">Ilott</span>
+    <span class="n">title</span><span class="p">:</span> <span class="n">Title</span>
+
+<span class="n">database</span><span class="p">:</span>
+    <span class="c1"># name of the output database. This is a database that is built to</span>
+    <span class="c1"># be compatible with the OCMSExplorer.</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">output_db</span>
+</pre></div>
+</div>
+<p>The majority of the parameters correspond to the dada2 arguments to the various functions in the dada2 package. You should familiarise yourself with these.</p>
+</div>
+<div class="section" id="executing-the-pipeline">
+<h3>Executing the pipeline<a class="headerlink" href="#executing-the-pipeline" title="Permalink to this headline">¶</a></h3>
+<p>Once you have set the parameters, the pipeline should be simple to run. If you are running on the cluster you can type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ocms_16s</span> <span class="n">dada2</span> <span class="n">make</span> <span class="n">full</span> <span class="o">-</span><span class="n">v5</span> <span class="o">-</span><span class="n">p100</span>
+</pre></div>
+</div>
+<p>where -v specifies the verbosity level of the logging output and -p specifies the number of processes you want to lauch per task e.g if you want to process 100 samples then specifiy -p100 and each sample will be processed in parallel and data combined in the final output tables. This will run through the dada2 workflow and produce the output files described in the next section.</p>
+<p>We hope that the pipeline is not restricted to those that do not have access to a cluster. Nevertheless, to run the pipeline on a laptop you will need access to a unix-like operating system (e.g. Mac). to run locally you can add the –local flag to the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ocms_16s</span> <span class="n">dada2</span> <span class="n">make</span> <span class="n">full</span> <span class="o">-</span><span class="n">v5</span> <span class="o">-</span><span class="n">p8</span> <span class="o">--</span><span class="n">local</span>
+</pre></div>
+</div>
+<p>specifying -p as the number of available processors you have on your machine.</p>
+<p>As the pipeline runs, logging information will be printed to the screen and also saved in the file pipeline.log. This file is useful to inspect if the pipeline crashes and you need to debug.</p>
+</div>
+<div class="section" id="output-files">
+<h3>Output files<a class="headerlink" href="#output-files" title="Permalink to this headline">¶</a></h3>
+<p>The main output file of the pipeline is the counts matrix that consists of amplicon sequence variants and their abundance in each sample. The pipeline assigns taxonomy to each ASV and this is incorporated into the ASV name in the resulting file. It is of the form:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 78%" />
+<col style="width: 10%" />
+<col style="width: 11%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>test_id</p></td>
+<td><p>Sample1</p></td>
+<td><p>Sample2</p></td>
+</tr>
+<tr class="row-even"><td><p>ASV1:p__phylum1;c__class1;o__order1;f__family1;g__genus1;s__species1</p></td>
+<td><p>1000</p></td>
+<td><p>1239</p></td>
+</tr>
+<tr class="row-odd"><td><p>ASV2:p__phylum2;c__class2;o__order2;f__family2;g__genus2;s__species2</p></td>
+<td><p>500</p></td>
+<td><p>10</p></td>
+</tr>
+<tr class="row-even"><td><p>ASV3:p__phylum3;c__class3;o__order3;f__family3;g__genus3;s__species3</p></td>
+<td><p>1000</p></td>
+<td><p>2300</p></td>
+</tr>
+</tbody>
+</table>
+<p>This file is created as abundance.dir/taxa_abundances.tsv.</p>
+<p>The purpose of this output file is that it can be taken forward in a easy fashion to look at differential abundance using software such as DESeq2 and this will be done on a per ASV level. If you wish to perform analysis on counts that have been summed over taxa at a particular taxonomic level you can use the following output files:</p>
+<ul class="simple">
+<li><p>taxonomy_abundances.dir/phylum_abundances.tsv</p></li>
+<li><p>taxonomy_abundances.dir/class_abundances.tsv</p></li>
+<li><p>taxonomy_abundances.dir/order_abundances.tsv</p></li>
+<li><p>taxonomy_abundances.dir/family_abundances.tsv</p></li>
+<li><p>taxonomy_abundances.dir/genus_abundances.tsv</p></li>
+<li><p>taxonomy_abundances.dir/species_abundances.tsv</p></li>
+</ul>
+</div>
+<div class="section" id="reporting">
+<h3>Reporting<a class="headerlink" href="#reporting" title="Permalink to this headline">¶</a></h3>
+<p>The pipeline also has a standard report that can be built using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ocms_16s</span> <span class="n">dada2</span> <span class="n">build_report</span> <span class="o">-</span><span class="n">v5</span>
+</pre></div>
+</div>
+<p>This will build the html report that can be found in report.dir/report.html and provides various pieces of information regarding the processing of the data through the dada2 workflow including number of reads kept during each procesing step as well as some basic taxonomy informationl.</p>
+</div>
+</div>
+<div class="section" id="downstream-analysis">
+<h2>Downstream analysis<a class="headerlink" href="#downstream-analysis" title="Permalink to this headline">¶</a></h2>
+<p>We have an example of downstream analysis that can be performed in R that can be found <a class="reference external" href="https://oxfordcms.github.io/OCMS-blog/bioinformatics/Example-16S-rRNA-Analysis">here</a>.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">OCMS_16S dada2</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Nick Ilott and Sandi yen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/dada2.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
