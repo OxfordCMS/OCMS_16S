@@ -1,6 +1,6 @@
 '''
-1;95;0c=======================================================
-run dada2 amplicon sequencing analysis
+=======================================================
+ocms_16s dada2 - amplicon sequencing analysis 
 =======================================================
 
 :Author: Nick Ilott
@@ -8,92 +8,152 @@ run dada2 amplicon sequencing analysis
 :Date: |today|
 :Tags: Python
 
+--------
 Purpose
 --------
 
-The purpose of this pipeline is to take amplicon sequencing data and run it through
-the DADA2 pipeline - this includes filtering and trimming reads, merging and clustering
-reads and assigning reads to taxa.
+This is a pipeline that is built using the `cgat-core`_ framework. The purpose of the pipeline is to run dada2 processing of amplicon sequencing data either on a compute cluster or locally. The pipeline consists of a number of wrapper scripts in R that are executed on the commandline and as such there is no requirement for R coding by the user. The hope is that the pipeline provides an accessible and user-friendly interface to produce reproducble results from an amplicon sequencing study.
 
-Dependencies
+You should familiarise yourself with the `dada2`_ workflow before running the pipeline to ensure that you understand the parameterisation.
+
+
+.. _cgat-core: https://github.com/cgat-developers/cgat-core
+
+.. _dada2: https://benjjneb.github.io/dada2/tutorial.html 
+
 -------------
-
-In order to run this pipeline you will need to install the following packages:
-
-* CGAT tools. The documentation can be found `here`_  
-
-.. _here: https://github.com/cgat-developers/cgat-flow
-
-* NGSKit. The code can be found in this `github repository`_.
-
-.. _github repository: https://github.com/nickilott/NGSKit
-
 Installation
 -------------
 
-You should install CGAT tools using the installation script that is provided, this will
-install everything you need into a conda environment. 
+The pipeline depends on having a number of python and R libraries installed. The easiest way at the moment to ensure that you have an environment that is compatible with our dada2 pipeline is to create a conda environment that has all of the relevant dependencies installed. The following steps outline how to install our dada2 pipeline.
 
-To activate the enviroment do the following::
+1. Download and install `conda`_ if you don't already have it.
 
-    source </full/path/to/folder/without/trailing/slash>/conda-install/etc/profile.d/conda.sh
-    conda activate base
-    conda activate cgat-f
+.. _conda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/
 
-    # finally, please run the cgatflow command-line tool to check the installation:
-    cgatflow --help
+2. Clone the OCMS_16S repository::
 
-.. warning::
+    git clone git@github.com:OxfordCMS/OCMS_16S.git
 
-    Make sure that you are installing CGAT into a clean environment i.e. with no modules
-    loaded from shared directories. You can do something like module purge to remove loaded
-    modules.
+3. Change into OCMS_16S directory::
 
-However it does not come with dada2 installed. Dada2 requires RcppParallel to be installed so
-first, so once you have activated the CGAT environment install this::
+    cd OCMS_16S
 
-    conda install -c conda-forge r-rcppparallel 
+4. Create ocms_16s conda environment::
 
-Then you should install the dada2 R package as follows::
+    conda env create -f envs/environment_ocms_16s.yaml
 
-    conda install -c bioconda bioconductor-dada2
+5. Activate the newly created environment::
 
-This should install dada2 so that when you start R you can simply type::
+    conda activate ocms_16s
 
-    library("dada2")
+6. Install ocms_16s dada2::
 
-You will in all likelihood also have to install optparse for argument parsing in the R scripts::
+    python setup.py install
 
-    conda install -c conda-forge r-optparse
+Now you are ready to go!
 
-Once you have successfully installed CGAT, dada2 and optparse, you should then download the NGSKit
-repository - this contains the dada2 pipeline (/pipelines/pipeline_dada2.py). In a development
-folder run::
-  
-    git clone git@github.com:nickilott/NGSKit.git
+---------------------
+Running the pipeline
+---------------------
 
-It is possible that the modules that are required for the pipeline to run will have to be
-placed into your PYTHONPATH::
-
-    PYTHONPATH=$PYTHONPATH:<path-to-NGSKit>
-    export $PYTHONPATH
+The pipeline runs using fastq files as input. It also requires parameters to be set that will be passed to the dada2 R scripts.
 
 Input files
 ------------
 
-The input is a directory of fastq formatted files. These should be placed in the directory in
-which you wish to run the pipeline. They must be of the format <name>.fastq.1.gz for single-end
-data and two files <name>.fastq.1.gz and <name>.fastq.2.gz for paired-end data.
+The input is a directory of fastq formatted files. These should be placed in the directory in which you wish to run the pipeline. They must be of the format <name>.fastq.1.gz for single-end data and two files <name>.fastq.1.gz and <name>.fastq.2.gz for paired-end data.
+
+For the pipeline to run succesfully you will also need to have downloaded relevant `dada2 databases`_ and point to them in the pipeline.yml parameters file as described in the next section.
+
+
+.. _dada2 databases: https://benjjneb.github.io/dada2/training.html
 
 Parameterisation
 ------------------
 
-There is a pipeline.yml file that specifies the parameters to be passed to dada2 and reporting
-functions in the pipeline. This is located in <path-to-NGSKit>/pipelines/pipeline_dada2/pipeline.yml
-and needs to be copied to your working directory. The parameters should be changed to suitable values.
-and are explained in the dada2 `tutorial`_. 
+The parameters for dada2 processing are specified in the pipeline.yml file. To create this file, move into the directory containing the fastq files that you wish to process and type::
 
-.. _tutorial: https://benjjneb.github.io/dada2/tutorial.html
+    ocms_16s dada2 config
+
+This will create the pipeline.yml file in the current working directory which you can edit using your favourite text editor. The parameters are provided in a standard yaml format as outlined below::
+
+    # specify whether data are paired or single end. The
+    # pipeline will pick up whether this is true but being
+    # explicit here is helpful
+    paired:
+
+    # dada2 parameters
+    trim:
+
+        # parameters used for trimming reads. If the data are
+        # paired-end then you need to specify 2 values for
+        # maxee, truncLen and trimLeft. These parameters must be specified
+        maxn: 0
+        maxee: 2,2
+        truncq: 2
+        trunclen: 250,160
+        trimleft: 0,0
+
+    sample_inference:
+
+        # parameters for sample inference. This includes
+        # error learning, de-replication, merging (if paired) and
+        # sample inference.
+
+        # number of reads to use (per sample) to estimate error
+        # model
+        nbases: 10000000
+
+        # additional options
+        options: ''
+
+    taxonomy:
+
+        memory: 10G
+
+        # assigning taxonomy
+        taxonomy_file: /gfs/mirror/dada2/RefSeq-RDP16S_v2_May2018.fa.gz
+
+        # This is the file that is used for the addSpecies function in
+        # dada2 for exact matching and species assignment. It must therefore
+        # be derived from the same database used as taxonomy_file above
+        species_file: /gfs/mirror/dada2/silva_species_assignment_v132.fa.gz
+
+    report:
+        # whether to run diagnostics report. This is only necessary if after the
+        # main report is built you want to get into more regarding the specifics of
+        # how dada2 processed sequences. Specify as 1 if you wish to run it
+        diagnostics:
+
+        # author and name of the project for reporting purposes
+        author: Nick Ilott
+        title: Title
+
+    database:
+        # name of the output database. This is a database that is built to
+        # be compatible with the OCMSExplorer.
+        name: output_db
+
+
+The majority of the parameters correspond to the dada2 arguments to the various functions in the dada2 package. You should familiarise yourself with these.
+
+
+Executing the pipeline
+-----------------------
+
+Once you have set the parameters, the pipeline should be simple to run. If you are running on the cluster you can type::
+
+    ocms_16s dada2 make full -v5 -p100
+
+where -v specifies the verbosity level of the logging output and -p specifies the number of processes you want to lauch per task e.g if you want to process 100 samples then specifiy -p100 and each sample will be processed in parallel and data combined in the final output tables. This will run through the dada2 workflow and produce the output files described in the next section. 
+
+We hope that the pipeline is not restricted to those that do not have access to a cluster. Nevertheless, to run the pipeline on a laptop you will need access to a unix-like operating system (e.g. Mac). to run locally you can add the --local flag to the command::
+
+    ocms_16s dada2 make full -v5 -p8 --local
+
+specifying -p as the number of available processors you have on your machine.
+
 
 Output files
 -------------
@@ -223,7 +283,7 @@ def filterAndTrim(infile, outfile):
     tmpdir = P.get_temp_dir()
     for inf in infiles:
         outtmp = os.path.join(tmpdir, inf.replace(".gz", ""))
-        statement = '''zcat %(inf)s > %(outtmp)s'''
+        statement = '''gunzip -c %(inf)s > %(outtmp)s'''
         P.run(statement)
 
     # hackabout
