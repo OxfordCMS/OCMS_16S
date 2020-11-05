@@ -1,1 +1,1 @@
-cgat-core
+cgatcore
