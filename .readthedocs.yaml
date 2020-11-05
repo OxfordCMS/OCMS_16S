@@ -1,0 +1,4 @@
+version: 2
+
+conda:
+  environment: envs/environment_ocms_16s.yaml
