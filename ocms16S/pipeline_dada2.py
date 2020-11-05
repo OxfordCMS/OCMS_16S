@@ -3,7 +3,7 @@
 ocms_16s dada2 - amplicon sequencing analysis 
 =======================================================
 
-:Author: Nick Ilott
+:Author: Nick Ilott, Sandi Yen
 :Release: $Id$
 :Date: |today|
 :Tags: Python
@@ -154,13 +154,12 @@ We hope that the pipeline is not restricted to those that do not have access to 
 
 specifying -p as the number of available processors you have on your machine.
 
+As the pipeline runs, logging information will be printed to the screen and also saved in the file pipeline.log. This file is useful to inspect if the pipeline crashes and you need to debug.
 
 Output files
 -------------
 
-The main output file of the pipeline is the counts matrix that consists of amplicon sequence variants
-and their abundance in each sample. The pipeline assigns taxonomy to each ASV and this is incorporated
-into the ASV name in the resulting file. It is of the form:
+The main output file of the pipeline is the counts matrix that consists of amplicon sequence variants and their abundance in each sample. The pipeline assigns taxonomy to each ASV and this is incorporated into the ASV name in the resulting file. It is of the form:
 
 +---------------------------------------------------------------------+---------+----------+
 |test_id                                                              | Sample1 | Sample2  |
@@ -172,11 +171,10 @@ into the ASV name in the resulting file. It is of the form:
 |ASV3:p__phylum3;c__class3;o__order3;f__family3;g__genus3;s__species3 | 1000    | 2300     |
 +---------------------------------------------------------------------+---------+----------+
 
+This file is created as abundance.dir/taxa_abundances.tsv.
 
-The purpose of this output file is that it can be taken forward in a easy fashion to look at differential
-abundance using software such as DESeq2 and this will be done on a per ASV level. If you wish to perform
-analysis on counts that have been summed over taxa at a particular taxonomic level you can use the following
-output files:
+
+The purpose of this output file is that it can be taken forward in a easy fashion to look at differential abundance using software such as DESeq2 and this will be done on a per ASV level. If you wish to perform analysis on counts that have been summed over taxa at a particular taxonomic level you can use the following output files:
 
 * taxonomy_abundances.dir/phylum_abundances.tsv
 * taxonomy_abundances.dir/class_abundances.tsv
@@ -185,22 +183,26 @@ output files:
 * taxonomy_abundances.dir/genus_abundances.tsv
 * taxonomy_abundances.dir/species_abundances.tsv
 
-Running the pipeline
----------------------
-
-Running the pipeline should be as simple as::
-
-    python <path-to-NGSKit>/pipelines/pipeline_dada2.py -v5 -p50 make full
-
-Set p to the number of processes that you want to run - this corresponds to the number of the samples
-that you want to run (unless it is a huge number and exceeds a reasonable number to run on the cluster).
 
 Reporting
 ----------
 
-Once the pipeline has finished you can build a report by running::
+The pipeline also has a standard report that can be built using::
 
-    python <path-to-NGSKit>/pipelines/pipeline_dada2.py -v5 -p50 make build_report
+    ocms_16s dada2 build_report -v5
+
+This will build the html report that can be found in report.dir/report.html and provides various pieces of information regarding the processing of the data through the dada2 workflow including number of reads kept during each procesing step as well as some basic taxonomy informationl.
+
+
+---------------------
+Downstream analysis
+---------------------
+
+We have an example of downstream analysis that can be performed in R that can be found `here`_.
+
+.. _here: https://oxfordcms.github.io/OCMS-blog/bioinformatics/Example-16S-rRNA-Analysis
+
+
 
 Code
 -----
