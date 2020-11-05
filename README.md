@@ -1,4 +1,12 @@
-This is a repository for pipelines and tools related to NGS data analysis.
+# OCMS_16S dada2
 
-Documentation that is currently uder development can be found [here](https://ngskit.readthedocs.io/en/latest/). At present it contains documentation for the analysing 16S rRNA amplicon data using pipeline_dada2.py - a CGAT-core pipeline that wraps DADA2 funtionality.
+This repository contains a [cgat-core](https://github.com/cgat-developers/cgat-core) pipeline for running dada2 analysis on amplicon sequencing data.
+
+## Requirements
+
+Linux or OSX
+
+## Documentation
+
+Please read the documentation at [readthedocs](https://ocms-16s.readthedocs.io/en/latest/index.html) for instructions on how to install and run the pipeline.
 
