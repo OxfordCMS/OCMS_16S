@@ -556,12 +556,12 @@ def build_report():
     P.run(statement)
 
     # add report_author and report_title
-    statement = '''sed -i 's/report_author/%(author)s/g' report.dir/report.Rmd;
-                   sed -i 's/report_title/%(title)s/g' report.dir/report.Rmd'''
+    statement = '''cat report.dir/report.Rmd | sed 's/report_author/%(author)s/g' > report.dir/report.Rmd;
+                   cat report.dir/report.Rmd | sed 's/report_title/%(title)s/g' > report.dir/report.Rmd'''
     P.run(statement)
 
     # add report_title
-    statement = '''sed -i 's/report_title/%(title)s/g' report.dir/pipeline_dada2.Rmd'''
+    statement = '''cat report.dir/pipelie_dada2.Rmd | sed  's/report_title/%(title)s/g' > report.dir/pipeline_dada2.Rmd'''
     P.run(statement)
 
     # render the report
