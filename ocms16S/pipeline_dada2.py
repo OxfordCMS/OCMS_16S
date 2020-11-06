@@ -561,7 +561,7 @@ def build_report():
     P.run(statement)
 
     # add report_title
-    statement = '''cat report.dir/pipelie_dada2.Rmd | sed  's/report_title/%(title)s/g' > report.dir/pipeline_dada2.Rmd'''
+    statement = '''cat report.dir/pipeline_dada2.Rmd | sed  's/report_title/%(title)s/g' > report.dir/pipeline_dada2.Rmd'''
     P.run(statement)
 
     # render the report
