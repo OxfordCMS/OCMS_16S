@@ -325,6 +325,7 @@ def runSampleInference(infile, outfile):
     nbases = PARAMS["sample_inference_nbases"]
     options = PARAMS["sample_inference_options"]
     outdir = os.path.dirname(outfile)
+    job_memory=PARAMS["sample_inference_memory"]
 
     if PARAMS["paired"] == 1:
         # get second read in pair

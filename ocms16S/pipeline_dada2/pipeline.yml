@@ -18,6 +18,8 @@ trim:
 
 sample_inference:
 
+    memory: 10G
+
     # parameters for sample inference. This includes
     # error learning, de-replication, merging (if paired) and
     # sample inference.
