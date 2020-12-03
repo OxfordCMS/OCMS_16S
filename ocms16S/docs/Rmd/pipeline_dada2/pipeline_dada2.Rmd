@@ -1,5 +1,5 @@
 ---
-title: "dada2 analysis"
+
 header-includes: #allows you to add in your own Latex packages
 - \usepackage{float} #use the 'float' package
 - \floatplacement{figure}{H} #make every figure with caption = h
@@ -24,9 +24,6 @@ knitr::opts_chunk$set(out.extra = '')
 #knitr::opts_chunk$set(fig.pos = 'H')
 knitr::opts_knit$set(root.dir = "../")
 ```
-
-# report_title
-
 
 ## Sample mapping
 

@@ -1,4 +1,5 @@
 ---
+title: "dada2 processing report"
 header-includes:
 - \usepackage{placeins}
 - \usepackage{float}
