@@ -556,15 +556,6 @@ def build_report():
     statement = '''cd report.dir; cp %(reportdir)s/*.Rmd .; cd ../'''
     P.run(statement)
 
-    # add report_author and report_title
-    statement = '''cat report.dir/report.Rmd | sed 's/report_author/%(author)s/g' > report.dir/report.Rmd;
-                   cat report.dir/report.Rmd | sed 's/report_title/%(title)s/g' > report.dir/report.Rmd'''
-    P.run(statement)
-
-    # add report_title
-    statement = '''cat report.dir/pipeline_dada2.Rmd | sed  's/report_title/%(title)s/g' > report.dir/pipeline_dada2.Rmd'''
-    P.run(statement)
-
     # render the report
     statement = '''cd report.dir; R -e "rmarkdown::render('report.Rmd', output_file='report.html')"; cd ../'''
     P.run(statement)
