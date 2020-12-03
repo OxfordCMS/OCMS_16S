@@ -543,8 +543,6 @@ def build_report():
     render the rmarkdown report file
     '''
     reportdir = os.path.join(os.path.dirname(PipelineDada2.__file__), "pipeline_docs/Rmd/pipeline_dada2/")
-    author = '"' + PARAMS["report_author"] + '"'
-    title = '"' + PARAMS["report_title"] + '"'
 
     # cp a file as error model - random one really
     errF_files = glob.glob("filtered.dir/*errF.png")
