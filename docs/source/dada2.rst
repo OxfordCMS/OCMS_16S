@@ -42,6 +42,12 @@ The pipeline depends on having a number of python and R libraries installed. The
 
     conda env create -f envs/environment_ocms_16s.yaml
 
+This can often be slow as conda tries to solve environment. If this happens you should try using mamba instead::
+
+    conda install -c conda-forge mamba
+
+    mamba env create -f envs/environment_ocms_16s.yaml
+    
 5. Activate the newly created environment::
 
     conda activate ocms_16s
