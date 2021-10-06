@@ -7,7 +7,7 @@ channels:
 dependencies:
   - bioconductor-dada2=1.14.0
   - cgat-apps=0.6.0
-  - cgatcore=0.6.5
+  - cgatcore
   - r-base=3.6.1
   - r-dplyr=1.0.2
   - r-ggplot2=3.3.2
