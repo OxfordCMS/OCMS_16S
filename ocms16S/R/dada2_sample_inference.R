@@ -113,7 +113,7 @@ if (is.na(opt$`filtR`)){
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
    filename <- paste(paste(directory, sample.name, sep="/"), "errF.png", sep="_")
-   ggsave(filename)
+   ggsave(filename, type="cairo")
 
    # dereplication
    flog.info("dereplication")
@@ -184,10 +184,10 @@ if (is.na(opt$`filtR`)){
    flog.info("plotting error model")
    p <- plotErrors(errF, nominalQ=TRUE)
    filename <- paste(paste(directory, sample.name, sep="/"), "errF.png", sep="_")
-   ggsave(filename, height=10, width=10)
+   ggsave(filename, height=10, width=10, type="cairo")
    p <- plotErrors(errR, nominalQ=TRUE)
    filename <- paste(paste(directory, sample.name, sep="/"), "errR.png", sep="_")
-   ggsave(filename)
+   ggsave(filename, type="cairo")
 
    # dereplication
    flog.info("dereplication")
