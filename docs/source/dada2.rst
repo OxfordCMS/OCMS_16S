@@ -249,7 +249,20 @@ specifying -p as the number of processors you have available.
 Running the pipeline on a cluster
 ----------------------------------
 
-The best way to maximise the utility of the pipeline is to run it on a high performance cluster - allowing you to parallelise sample processing::
+The best way to maximise the utility of the pipeline is to run it on a high performance cluster - allowing you to parallelise sample processing.To run on a cluster you will have to have a .cgat.yml file in your home directory that specifies the queue manager, queue to use etc. An example is belo::
+
+
+    cluster:
+        queue_manager: <slurm|sge|pbstorque>
+        parallel_environment: <pe name>
+        queue: <queue_name>
+
+
+You will also need to make sure that the pipeline has access to the drmaa library so it's best to set this as an environmental variable in your ~/.bashrc::
+
+    export DRMAA_LIBRARY_PATH=/<full-path>/libdrmaa.so
+
+Once set up you should be able to run::
 
     ocms_16s dada2 make full -v5 -p100
 
