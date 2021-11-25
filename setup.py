@@ -15,7 +15,7 @@ setup(
     platforms=["any"],
     keywords="microbiome, metagenomics, genomics",
     url="https://github.com/OxfordCMS/OCMS_16S",
-    packages=find_packages("./") + find_packages("./pipelines"),
+    packages=find_packages("./") + find_packages("./ocms16S/"),
     entry_points={
         'console_scripts': ['ocms_16s = ocms16S.ocms_16s:main']
     },
