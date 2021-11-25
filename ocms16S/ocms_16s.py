@@ -25,7 +25,7 @@ def main(argv=None):
     command = argv[1]
     pipeline = "pipeline_{}".format(command)
     
-    # remove 'cgatflow' from sys.argv
+    # remove 'ocms_16s' from sys.argv
     del sys.argv[0]
 
     (file, pathname, description) = imp.find_module(pipeline, paths)
