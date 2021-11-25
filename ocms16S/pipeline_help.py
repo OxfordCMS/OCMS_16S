@@ -50,19 +50,22 @@ def main(argv=None):
     parser.add_argument("--filterAndTrim", dest="filter_and_trim",
                         action='store_true', help="return options for filterAndTrim task")
     parser.add_argument("--sampleInference", dest="sample_inference",
-                        action='store_true', help="return options for filterAndTrim task")
+                        action='store_true', help="return options for sampleInference task")
     parser.add_argument("--assignTaxonomy", dest="assign_taxonomy",
-                        action='store_true', help="return options for filterAndTrim task")
+                        action='store_true', help="return options for assignTaxonomy task")
 
     # add common options (-h/--help, ...) and parse command line
     (args) = parser.parse_args()
 
     rscriptsdir = os.path.join(os.path.dirname(PipelineDada2.__file__), "R")
     if args.filter_and_trim:
+        assert not args.sample_inference and not args.assign_taxonomy, "can only view options for one task at a time"
         script = os.path.join(rscriptsdir, "dada2_filter_and_trim.R")
     elif args.sample_inference:
+        assert not args.filter_and_trim and not args.assign_taxonomy, "can only view options for one task at a time"
         script = os.path.join(rscriptsdir, "dada2_sample_inference.R")
     elif args.assign_taxonomy:
+        assert not args.sample_inference and not args.filter_and_trim, "can only view options for one task at a time"
         script = os.path.join(rscriptsdir, "dada2_sample_inference.R")
     os.system(f'Rscript {script} -h')
 
