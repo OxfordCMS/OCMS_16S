@@ -1,3 +1,22 @@
+#############################################################################
+#############################################################################
+#############################################################################
+# Configuration file for OCMS_16S dada2.
+#
+# The parameters and options that are passed to the wrappers around dada2
+# functions are the same as those in the dada2 package. For a full list of
+# the parameters and verbatim explanation of them (from dada2 package)
+# you can use the help functions
+#
+# e.g. ocms_16s dada2 help --filterAndTrim
+#      ocms_16s dada2 help --sampleInference
+#      ocms_16s dada2 help --assignTaxonomy
+#
+#############################################################################
+#############################################################################
+#############################################################################
+
+# Edit parameters
 
 # specify whether data are paired or single end. The
 # pipeline will pick up whether this is true but being
@@ -9,7 +28,7 @@ trim:
 
     # parameters used for trimming reads. If the data are
     # paired-end then you need to specify 2 values for
-    # maxee, truncLen and trimLeft. These parameters must be specified
+    # maxee, truncLen and trimLeft. These parameters must be specified.
     maxn: 0
     maxee: 2,2
     truncq: 2
@@ -36,22 +55,18 @@ taxonomy:
     memory: 10G
 
     # assigning taxonomy
-    taxonomy_file: /gfs/mirror/dada2/RefSeq-RDP16S_v2_May2018.fa.gz
+    taxonomy_file: RefSeq-RDP16S_v2_May2018.fa.gz
 
     # This is the file that is used for the addSpecies function in
     # dada2 for exact matching and species assignment. It must therefore
     # be derived from the same database used as taxonomy_file above
-    species_file: /gfs/mirror/dada2/silva_species_assignment_v132.fa.gz
+    species_file: RefSeq_species_assignment_v132.fa.gz
 
 report:
     # whether to run diagnostics report. This is only necessary if after the
     # main report is built you want to get into more regarding the specifics of
     # how dada2 processed sequences. Specify as 1 if you wish to run it
     diagnostics:
-
-    # author and name of the project for reporting purposes
-    author: Nick Ilott
-    title: Title 
 
 database:
     # name of the output database. This is a database that is built to
