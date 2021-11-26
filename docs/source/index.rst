@@ -6,6 +6,7 @@ OCMS_16S dada2 documentation
    :caption: Contents:
 
    dada2
+   tutorial
    
 Indices and tables
 ==================
