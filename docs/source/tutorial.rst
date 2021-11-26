@@ -63,52 +63,52 @@ This produces the pipeline.yml file that we can now edit::
     # dada2 parameters
     trim:
 
-    # parameters used for trimming reads. If the data are
-    # paired-end then you need to specify 2 values for
-    # maxee, truncLen and trimLeft. These parameters must be specified.
-    maxn: 0
-    maxee: 2,2
-    truncq: 2
-    trunclen: 250,250
-    trimleft: 0,0
+        # parameters used for trimming reads. If the data are
+        # paired-end then you need to specify 2 values for
+        # maxee, truncLen and trimLeft. These parameters must be specified.
+        maxn: 0
+        maxee: 2,2
+        truncq: 2
+        trunclen: 250,250
+        trimleft: 0,0
 
     sample_inference:
 
-    memory: 10G
+        memory: 10G
 
-    # parameters for sample inference. This includes
-    # error learning, de-replication, merging (if paired) and
-    # sample inference.
+        # parameters for sample inference. This includes
+        # error learning, de-replication, merging (if paired) and
+        # sample inference.
 
-    # number of reads to use (per sample) to estimate error
-    # model
-    nbases: 10000000
+        # number of reads to use (per sample) to estimate error
+        # model
+        nbases: 10000000
 
-    # additional options
-    options: ''
+        # additional options
+        options: ''
 
     taxonomy:
 
-    memory: 10G
+        memory: 10G
 
-    # assigning taxonomy
-    taxonomy_file: RefSeq-RDP16S_v2_May2018.fa.gz
+        # assigning taxonomy
+        taxonomy_file: RefSeq-RDP16S_v2_May2018.fa.gz
 
-    # This is the file that is used for the addSpecies function in
-    # dada2 for exact matching and species assignment. It must therefore
-    # be derived from the same database used as taxonomy_file above
-    species_file: RefSeq-RDP_dada2_assignment_species.fa.gz
+        # This is the file that is used for the addSpecies function in
+        # dada2 for exact matching and species assignment. It must therefore
+        # be derived from the same database used as taxonomy_file above
+        species_file: RefSeq-RDP_dada2_assignment_species.fa.gz
 
     report:
-    #   whether to run diagnostics report. This is only necessary if after the
-    # main report is built you want to get into more regarding the specifics of
-    # how dada2 processed sequences. Specify as 1 if you wish to run it
-    diagnostics:
+        #   whether to run diagnostics report. This is only necessary if after the
+        # main report is built you want to get into more regarding the specifics of
+        # how dada2 processed sequences. Specify as 1 if you wish to run it
+        diagnostics:
 
     database:
-    # name of the output database. This is a database that is built to
-    # be compatible with the OCMSlooksy.
-    name: output_db
+        # name of the output database. This is a database that is built to
+        # be compatible with the OCMSlooksy.
+        name: output_db
 
 
 For this example, we specify that the data are paired and we want the final length of both the forward and reverse reads to be 250bp. This will result in fully overlapping reads when pairs are merged during dada2 processing.
