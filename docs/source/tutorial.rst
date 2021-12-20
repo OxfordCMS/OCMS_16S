@@ -69,7 +69,7 @@ This produces the pipeline.yml file that we can now edit::
         maxn: 0
         maxee: 2,2
         truncq: 2
-        trunclen: 250,250
+        trunclen: 150,150
         trimleft: 0,0
 
     sample_inference:
@@ -111,7 +111,7 @@ This produces the pipeline.yml file that we can now edit::
         name: output_db
 
 
-For this example, we specify that the data are paired and we want the final length of both the forward and reverse reads to be 250bp. This will result in fully overlapping reads when pairs are merged during dada2 processing.
+For this example, we specify that the data are paired and we want the final length of both the forward and reverse reads to be 150bp.
 
 The default settings are taken from the defaults used by dada2. If you want an explanation of the parameters for the dada2 steps then you can type for example::
 
