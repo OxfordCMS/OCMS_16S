@@ -84,9 +84,7 @@ You can use a python virtual environment to install python dependencies whilst r
     # first install some dependencies
     pip install apsw gevent numpy==1.19.5 pandas paramiko pep8 pytest pytest-pep8 drmaa pyyaml ruffus setuptools six sqlalchemy
 
-    git clone https://github.com/cgat-developers/cgat-core.git
-    cd cgat-core
-    python setup.py install
+    pip install cgatcore
 
 4. Make sure you have other R dependencies installed::
 
@@ -114,9 +112,7 @@ You can install these one-by-one or using the script, install_r_packages.R, that
 
 6. Install OCMS_16S::
 
-    git clone https://github.com/OxfordCMS/OCMS_16S.git
-    cd OCMS_16S
-    python setup.py install
+    pip install ocms-16s
     
 
 ---------------------
