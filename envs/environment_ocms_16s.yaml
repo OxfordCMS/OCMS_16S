@@ -6,7 +6,6 @@ channels:
   - defaults
 dependencies:
   - bioconductor-dada2=1.14.0
-  - cgat-apps=0.6.0
   - cgatcore
   - r-base=3.6.1
   - r-dplyr=1.0.2
