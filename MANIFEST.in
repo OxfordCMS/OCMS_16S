@@ -1,3 +1,4 @@
+include ocms16S/scripts/*.py
 include ocms16S/R/*.R
 include ocms16S/pipeline_dada2/pipeline.yml
 include ocms16S/pipeline_docs/Rmd/pipeline_dada2/*.Rmd
