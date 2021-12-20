@@ -15,7 +15,7 @@ setup(
     platforms=["any"],
     keywords="microbiome, metagenomics, genomics",
     url="https://github.com/OxfordCMS/OCMS_16S",
-    download_url="https://github.com/OxfordCMS/OCMS_16S/archive/refs/tags/v0.0.1.tar.gz",
+    download_url="https://github.com/OxfordCMS/OCMS_16S/archive/refs/tags/v0.0.2.tar.gz",
     install_requires=["cgatcore"],
     packages=find_packages("./") + find_packages("./ocms16S/"),
     entry_points={
