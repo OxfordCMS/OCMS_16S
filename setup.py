@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 setup(
     # package information
     name='ocms_16S',
-    version="0.0.1",
+    version="0.0.2",
     description='OCMS_16S : Oxford Centre for Microbiome Studies pipelines for 16S amplicon sequencing analysis',
     author='Nicholas Ilott, Sandi Yen, Jethro Johnson',
     license="MIT",
