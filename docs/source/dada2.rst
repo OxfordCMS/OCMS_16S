@@ -82,20 +82,13 @@ You can use a python virtual environment to install python dependencies whilst r
 3. Install cgat-core::
 
     # first install some dependencies
-    pip install apsw gevent numpy==1.19.5 pandas paramiko pep8 pytest pytest-pep8 drmaa pyyaml ruffus setuptools six sqlalchemy cython pysam
+    pip install apsw gevent numpy==1.19.5 pandas paramiko pep8 pytest pytest-pep8 drmaa pyyaml ruffus setuptools six sqlalchemy
 
     git clone https://github.com/cgat-developers/cgat-core.git
     cd cgat-core
     python setup.py install
 
-4. Install cgat-apps (for this to build succesfully you will need to have Samtools installed and in your path)::
-
-    cd ../
-    git clone https://github.com/cgat-developers/cgat-apps.git
-    cd cgat-apps
-    python setup.py install
-    
-5. Make sure you have other R dependencies installed::
+4. Make sure you have other R dependencies installed::
 
     dplyr
     ggplot2
@@ -113,13 +106,13 @@ You can install these one-by-one or using the script, install_r_packages.R, that
 
     source("install_r_packages.R")
 
-6. Install dada2 as described `here`_
+5. Install dada2 as described `here`_
 
 
 .. _here: https://benjjneb.github.io/dada2/dada-installation.html
     
 
-7. Install OCMS_16S::
+6. Install OCMS_16S::
 
     git clone https://github.com/OxfordCMS/OCMS_16S.git
     cd OCMS_16S

@@ -234,6 +234,7 @@ PARAMS = P.get_params()
 
 # scripts directory - R scripts for dada2 functions
 PARAMS["rscriptsdir"] = os.path.join(os.path.dirname(PipelineDada2.__file__), "R")
+PARAMS["pyscriptsdir"] = os.path.join(os.path.dirname(PipelineDada2.__file__), "scripts")
 
 ###################################################
 ###################################################
@@ -357,7 +358,7 @@ def mergeAbundanceTables(infiles, outfile):
     combine sequence/abundance tables across
     samples
     '''
-    statement = '''cgat combine_tables
+    statement = '''python %(pyscriptsdir)s/combine_tables.py
                    -m 0
                    -c 1
                    -k 2
