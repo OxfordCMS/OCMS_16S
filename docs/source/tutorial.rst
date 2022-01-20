@@ -16,15 +16,8 @@ We have provided links to raw data in the OCMS_16S repository (OCMS_16S/tutorial
 
 This will place the raw fastq files in your working directory.
 
-Step 2: Rename files
------------------------
 
-To allow the pipeline to run, the filenames must satisfy a standard format. This is <something>.fastq.1.gz (with <something>.fastq.2.gz when data are paired). Therefore in this example we will rename the files::
-
-    rename .R1.fastq.gz .fastq.1.gz *.R1.fastq.gz
-    rename .R2.fastq.gz .fastq.2.gz *.R2.fastq.gz
-
-Step 3: Create and edit configuration file
+Step 2: Create and edit configuration file
 -------------------------------------------
 
 We need a pipeline.yml file to pass parameters to pipeline tasks. To create this we type::
@@ -161,7 +154,7 @@ We will leave the majority of settings as they are for this example. However, we
 
 These are then specified in the pipeline.yml as above.
 
-Step 4: Run the pipeline
+Step 3: Run the pipeline
 --------------------------
 
 Once you are happy with the parameterisation, you can run the pipeline::
@@ -191,7 +184,7 @@ When the pipeline has finished running, the log file will look like this::
     2020-02-06 12:08:28,801 INFO main experiment - job finished in 3002 seconds at Thu Feb  6 12:08:28 2020 -- 66.94 45.21  5.67  9.90 -- 8e55fc3a-59c9-4f94-b014-1062ee84c9bc
 
 
-Step 5: Build the report
+Step 4: Build the report
 -------------------------
 
 You can then build the report to inspect the performance of the processing::
@@ -203,7 +196,7 @@ You can then build the report to inspect the performance of the processing::
 This will produce the file report.dir/report.html that you can view in your browser.
  
 
-Step 6: Downstream analysis with OCMSlooksy
+Step 5: Downstream analysis with OCMSlooksy
 --------------------------------------------
 
 OCMSlooksy is an R/Shiny application that will take the output from OCMS_16S dada2 and enable the user to inspect the parameters of the dada2 run, the processing results as well as perform downstream viosualisation and statistical analyses. To format the outputs from OCMS_16S dada2 for OCMSlooksy you can run::
