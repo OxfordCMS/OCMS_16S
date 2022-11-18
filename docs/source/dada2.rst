@@ -282,7 +282,7 @@ Building a report
 
 Once the pipeline has finished, there is opportunity to assess the dada2 processing results in an html report by running::
 
-    ocms_16s dada2 build_report
+    ocms_16s dada2 make build_report
 
 This will build the report, report.dir/report.html which you can inspect.
 
@@ -292,7 +292,7 @@ Transition to OCMSlooksy
 
 OCMSlooksy is an R/Shiny application that enables users to inspect data from this dada2 processing pipeline as well as perform statistical analysis and visualisation. By running::
 
-    ocms_16s dada2 build_db
+    ocms_16s dada2 make build_db
 
 you will build an sqlite database that contains all of the outputs neccessary to load into OCMSlooksy. The database will be named according to the specification in the pipipeline.yml. In the example above it would be called 'output_db' and this would be present in the current working directory.
 
