@@ -75,6 +75,10 @@ option_list <- list(
                            help="filter sequences out if (n0+n1)/abundance < --filter. This hopes to remove
                            spurious sequences that are a partition that contains sequences with few true
                            matches [default %default]"),
+               make_option(c("--max-mismatch"), default=0, 
+                           help="maximum mismatches allowed when merging pairs [default %default]"),
+               make_option(c("--min-overlap"), default=12,
+                           help="minimum overlap when mergeing pairs [default %default]"),
                make_option(c("-o", "--outdir"), default=".",
                            help="output directory - name will be based on file name [default %default]")
 			   )
@@ -230,7 +234,14 @@ if (is.na(opt$`filtR`)){
 
    # merge pairs - returns a dataframe
    flog.info("merging paired reads")
-   mergers <- mergePairs(dadaF, derepF, dadaR, derepR, verbose=TRUE, propagateCol=c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave", "abundance"))
+   mergers <- mergePairs(dadaF,
+                         derepF,
+                         dadaR,
+                         derepR,
+                         verbose=TRUE,
+                         minOverlap = opt$`min-overlap`,
+                         maxMismatch = opt$`max-mismatch`,
+                         propagateCol=c("n0", "n1", "nunq", "pval", "birth_type", "birth_pval", "birth_fold", "birth_ham", "birth_qave", "abundance"))
 
 
    # get diagnostic clustering data frame
