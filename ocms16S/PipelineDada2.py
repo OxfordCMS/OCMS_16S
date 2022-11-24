@@ -90,7 +90,11 @@ def mergeTaxonomyTables(infiles, outfile):
     outf = open(outfile, "w")
     outf.write("featureID\tsequence\tKingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies\tTaxon\n")
     for seq, taxa in taxonomy.items():
-        entry = id_dict[seq] + "\t" + seq + "\t" + "\t".join(taxa) + "\n"
+        try:
+            entry = id_dict[seq] + "\t" + seq + "\t" + "\t".join(taxa) + "\n"
+        except KeyError:
+            print(f"could not find sequence {seq} in dictionary: Check origins of sequence") 
+            continue
         outf.write(entry)
     outf.close()
 
