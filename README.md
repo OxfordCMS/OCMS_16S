@@ -1,4 +1,4 @@
-# ocms_16s dada2 - amplicon sequencing analysis
+# OCMS_16S - amplicon sequencing analysis
 
 ## Purpose
 
