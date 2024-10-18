@@ -18,13 +18,17 @@ def main(argv=None):
 
     path = os.path.join(os.path.abspath(os.path.dirname(__file__)))
     paths = [path, os.path.abspath(os.path.basename(__file__))[:-3]]
+    paths.append(os.path.join(path, "scripts"))
     
     if len(argv) == 1 or argv[1] == "--help" or argv[1] == "-h":
         print((globals()["__doc__"]))
 
     command = argv[1]
     pipeline = "pipeline_{}".format(command)
-    
+
+    if not os.path.exists(os.path.join(path, pipeline + ".py")):
+        pipeline = command
+        
     # remove 'ocms_16s' from sys.argv
     del sys.argv[0]
 
