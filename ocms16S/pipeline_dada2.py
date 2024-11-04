@@ -214,12 +214,15 @@ Code
 from ruffus import *
 import cgatcore.experiment as E
 import cgatcore.pipeline as P
+import cgatcore.iotools as IOTools
 import shutil
 import logging as L
 import os
 import sys
 import glob
 import re
+import sqlite3
+import pandas as pd
 import ocms16S.PipelineDada2 as PipelineDada2
 
 ###################################################
@@ -530,9 +533,15 @@ def build_db(infile, outfile):
     # record merged_filter_summary, merged_qc_summary,
     # merged_taxonomy, merged_abundance_id
     # and yml table in database
-    db_name = PARAMS["database_name"]
-    P.load(infile, outfile, options=f'--database-url=sqlite:///./{db_name}')
+    db_name = PARAMS["database_name"] + '.db'
+    table_name = infile.rstrip(".tsv")
+    entry = pd.read_table(IOTools.open_file(infile))
+    entry.to_sql(table_name, con=sqlite3.connect(db_name), if_exists='replace')
 
+    # touch output file
+    statement = "touch %(outfile)s"
+    P.run(statement)
+    
 #########################################
 #########################################
 #########################################
