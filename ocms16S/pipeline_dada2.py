@@ -536,7 +536,8 @@ def build_db(infile, outfile):
     db_name = PARAMS["database_name"] + '.db'
     table_name = os.path.basename(infile).rstrip(".tsv")
     entry = pd.read_table(IOTools.open_file(infile))
-    entry.to_sql(table_name, con=sqlite3.connect(db_name), if_exists='replace')
+    entry.to_sql(table_name, con=sqlite3.connect(db_name),
+                 if_exists='replace', index=False)
 
     # touch output file
     statement = "touch %(outfile)s"
