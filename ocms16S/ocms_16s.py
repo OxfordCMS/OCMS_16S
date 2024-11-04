@@ -17,7 +17,7 @@ def main(argv=None):
     argv = sys.argv
 
     path = os.path.join(os.path.abspath(os.path.dirname(__file__)))
-    paths = [path, os.path.abspath(os.path.basename(__file__))[:-3]]
+    paths = [path, os.path.abspath(__file__)[:-3]]
     paths.append(os.path.join(path, "scripts"))
     
     if len(argv) == 1 or argv[1] == "--help" or argv[1] == "-h":
