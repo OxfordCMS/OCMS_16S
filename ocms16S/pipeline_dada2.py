@@ -534,7 +534,7 @@ def build_db(infile, outfile):
     # merged_taxonomy, merged_abundance_id
     # and yml table in database
     db_name = PARAMS["database_name"] + '.db'
-    table_name = infile.rstrip(".tsv")
+    table_name = os.path.basename(infile).rstrip(".tsv")
     entry = pd.read_table(IOTools.open_file(infile))
     entry.to_sql(table_name, con=sqlite3.connect(db_name), if_exists='replace')
 
